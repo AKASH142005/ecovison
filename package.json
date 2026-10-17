@@ -1,0 +1,15 @@
+{
+  "name": "ecovision",
+  "version": "1.0.0",
+  "description": "EcoVision - Smart Waste Management & Collector Navigation for Tamil Nadu",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
