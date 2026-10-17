@@ -15,16 +15,16 @@ export const memoryStore = {
 
 export async function connectDB() {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ecovision_tn';
-  
+
   try {
     console.log(`Connecting to MongoDB at ${uri}...`);
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 1500
     });
-    
+
     isConnected = true;
     console.log(' MongoDB connected successfully via Mongoose.');
-    
+
     // Seed initial data if collections are empty
     await seedDatabaseIfEmpty();
   } catch (error) {
