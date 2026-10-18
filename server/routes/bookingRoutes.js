@@ -1,9 +1,10 @@
 import { Booking } from '../models/Booking.js';
-import { isDbLive, memoryStore } from '../config/db.js';
+import { isDbLive, memoryStore, logAudit } from '../config/db.js';
+import { verifyToken } from '../middleware/auth.js';
 
 export default async function bookingRoutes(fastify, options) {
   // GET bookings
-  fastify.get('/bookings', async () => {
+  fastify.get('/bookings', async (request) => {
     let bookings = [];
     if (isDbLive()) {
       try {
@@ -18,7 +19,7 @@ export default async function bookingRoutes(fastify, options) {
     return { success: true, count: bookings.length, bookings };
   });
 
-  // POST create booking
+  // POST create booking / pickup request
   fastify.post('/bookings', async (request, reply) => {
     const {
       collectorId,
@@ -42,11 +43,19 @@ export default async function bookingRoutes(fastify, options) {
       });
     }
 
+    // Try reading user from auth token if present
+    const authHeader = request.headers.authorization;
+    let customerId = 'usr_customer_1';
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.substring(7));
+      if (decoded && decoded.id) customerId = decoded.id;
+    }
+
     // Lookup rates and CO2 factors
     const weight = parseFloat(estimatedWeightKg) || 1;
     const cat = memoryStore.categories.find(c => c.id === wasteCategory) || {};
-    const rate = cat.avgMarketRatePerKg || 15;
-    const co2PerKg = cat.carbonOffsetPerKg || 1.5;
+    const rate = cat.avgMarketRatePerKg || 18;
+    const co2PerKg = cat.carbonOffsetPerKg || 1.8;
 
     const estimatedReward = Math.round(weight * rate);
     const co2SavedKg = Math.round(weight * co2PerKg * 10) / 10;
@@ -54,11 +63,13 @@ export default async function bookingRoutes(fastify, options) {
 
     const newBookingData = {
       bookingId,
+      customerId,
       collectorId,
       collectorName: collectorName || 'EcoVision Tamil Nadu Hub',
       type,
       wasteCategory,
       estimatedWeightKg: weight,
+      actualWeightKg: 0,
       userName,
       userPhone,
       userAddress: userAddress || 'Direct drop-off at center',
@@ -67,7 +78,7 @@ export default async function bookingRoutes(fastify, options) {
       timeSlot: timeSlot || '10:00 AM - 01:00 PM',
       estimatedReward,
       co2SavedKg,
-      status: 'confirmed',
+      status: type === 'doorstep_pickup' ? 'pending' : 'confirmed',
       notes,
       createdAt: new Date()
     };
@@ -85,9 +96,18 @@ export default async function bookingRoutes(fastify, options) {
       memoryStore.bookings.unshift(newBookingData);
     }
 
+    await logAudit({
+      action: 'PICKUP_CREATED',
+      category: 'PICKUP',
+      actor: { id: customerId, name: userName, role: 'customer' },
+      targetResource: 'Booking',
+      targetId: bookingId,
+      details: `Citizen ${userName} created ${type === 'doorstep_pickup' ? 'doorstep pickup' : 'dropoff'} request ${bookingId} for ~${weight} kg of ${wasteCategory.toUpperCase()} in ${district}.`
+    });
+
     return reply.code(201).send({
       success: true,
-      message: 'Booking confirmed successfully!',
+      message: `${type === 'doorstep_pickup' ? 'Pickup request' : 'Drop-off'} confirmed successfully!`,
       booking: savedBooking
     });
   });

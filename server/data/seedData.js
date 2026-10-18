@@ -123,7 +123,7 @@ export const SEED_CATEGORIES = [
       'Remove heavy metal buckles or plastic zippers if possible',
       'Sort by cotton vs polyester synthetics for higher value'
     ],
-    commonExamples: ['Old cotton shirts & jeans', 'Tiruppur hosiery clippings', 'Worn bedsheets', 'Denim scraps']
+    commonExamples: ['Old cotton shirts & jeans', 'Chennai garment clippings', 'Worn bedsheets', 'Denim scraps']
   },
   {
     id: 'hazardous',
@@ -146,23 +146,29 @@ export const SEED_CATEGORIES = [
 ];
 
 export const SEED_COLLECTORS = [
-  // --- CHENNAI ---
+  // 1. Guindy
   {
+    _id: 'mem_col_1',
     name: 'Guindy Eco-Recovery Industrial Hub',
-    district: 'Chennai',
+    district: 'Guindy',
+    zone: 'Guindy',
     city: 'Chennai',
     address: 'Plot 42, SIDCO Industrial Estate, Guindy, Chennai, Tamil Nadu 600032',
     lat: 13.0067,
     lng: 80.2012,
     phone: '+91 94441 23489',
-    email: 'guindy.ecohub@tamilnadu-waste.org',
+    email: 'guindy.ecohub@chennairecycle.org',
     tnpcbRegNo: 'TNPCB/CHN/IND/2023/0411',
     rating: 4.9,
     totalReviews: 128,
     operatingHours: '08:00 AM - 07:30 PM (Mon-Sat)',
     capacityLoad: 38,
     isVerified: true,
-    description: 'Authorized TNPCB e-waste, polymer, and non-ferrous metal recycling collection facility in South Chennai.',
+    pointType: 'dealer',
+    serviceRadiusKm: 8,
+    serviceWards: ['Guindy', 'Saidapet', 'Alandur', 'Ekkatuthangal', 'Jafferkhanpet'],
+    dealerUserId: 'usr_dealer_1',
+    description: 'Premier South Chennai industrial hub authorized for e-waste, scrap alloys, and post-consumer polymer baling with automated weighbridge.',
     acceptedWasteTypes: [
       { category: 'plastic', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true },
       { category: 'ewaste', ratePerKg: 65, acceptsDropoff: true, acceptsPickup: true },
@@ -170,22 +176,28 @@ export const SEED_COLLECTORS = [
       { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
+  // 2. Ambattur
   {
+    _id: 'mem_col_2',
     name: 'Ambattur Material Recovery & Circularity Center',
-    district: 'Chennai',
+    district: 'Ambattur',
+    zone: 'Ambattur',
     city: 'Chennai',
     address: '3rd Main Rd, Ambattur Industrial Estate, Chennai, Tamil Nadu 600058',
     lat: 13.1143,
     lng: 80.1548,
     phone: '+91 98402 87612',
-    email: 'ambattur.mrf@tnrecycles.gov.in',
+    email: 'ambattur.mrf@chennaicorporation.gov.in',
     tnpcbRegNo: 'TNPCB/CHN/MRF/2022/8821',
     rating: 4.8,
     totalReviews: 94,
     operatingHours: '08:30 AM - 06:30 PM (All Days)',
     capacityLoad: 52,
     isVerified: true,
-    description: 'North-West Chennai hub specializing in industrial grade plastics, metal turnings, and cardboard baling.',
+    pointType: 'dealer',
+    serviceRadiusKm: 10,
+    serviceWards: ['Ambattur', 'Mogappair', 'Padi', 'Korattur', 'Avadi'],
+    description: 'North-West Chennai hub specializing in industrial grade plastics, metal turnings, and corrugated baling.',
     acceptedWasteTypes: [
       { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
       { category: 'metal', ratePerKg: 38, acceptsDropoff: true, acceptsPickup: true },
@@ -193,22 +205,115 @@ export const SEED_COLLECTORS = [
       { category: 'glass', ratePerKg: 9, acceptsDropoff: true, acceptsPickup: false }
     ]
   },
+  // 3. Adyar
   {
-    name: 'Perungudi Green Earth Recycling Park',
-    district: 'Chennai',
+    _id: 'mem_col_3',
+    name: 'Adyar & Besant Nagar Green Resource Hub',
+    district: 'Adyar',
+    zone: 'Adyar',
+    city: 'Chennai',
+    address: '4th Main Road, Gandhi Nagar, Adyar, Chennai, Tamil Nadu 600020',
+    lat: 13.0012,
+    lng: 80.2565,
+    phone: '+91 94443 19024',
+    email: 'adyar.green@chennairecycle.org',
+    tnpcbRegNo: 'TNPCB/CHN/ADY/2024/0912',
+    rating: 4.9,
+    totalReviews: 110,
+    operatingHours: '07:30 AM - 07:00 PM (Daily)',
+    capacityLoad: 34,
+    isVerified: true,
+    pointType: 'dealer',
+    serviceRadiusKm: 7,
+    serviceWards: ['Adyar', 'Besant Nagar', 'Thiruvanmiyur', 'Kotturpuram', 'R.A. Puram'],
+    description: 'GCC Zone 13 Model Resource Recovery Facility handling household dry recyclables, e-waste, and coastal cleanup items.',
+    acceptedWasteTypes: [
+      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'ewaste', ratePerKg: 60, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'organic', ratePerKg: 5, acceptsDropoff: true, acceptsPickup: true }
+    ]
+  },
+  // 4. Anna Nagar
+  {
+    _id: 'mem_col_4',
+    name: 'Anna Nagar Smart Sorting & Baling Facility',
+    district: 'Anna Nagar',
+    zone: 'Anna Nagar',
+    city: 'Chennai',
+    address: '2nd Avenue, Near Roundtana, Anna Nagar West, Chennai, Tamil Nadu 600040',
+    lat: 13.0850,
+    lng: 80.2100,
+    phone: '+91 98401 55432',
+    email: 'annanagar.smart@ecovision.org',
+    tnpcbRegNo: 'TNPCB/CHN/ANN/2023/1145',
+    rating: 4.8,
+    totalReviews: 86,
+    operatingHours: '08:00 AM - 07:00 PM (Mon-Sat)',
+    capacityLoad: 44,
+    isVerified: true,
+    pointType: 'dealer',
+    serviceRadiusKm: 8,
+    serviceWards: ['Anna Nagar', 'Kilpauk', 'Shenoy Nagar', 'Aminjikarai', 'Arumbakkam'],
+    description: 'GCC Zone 8 flagship automated segregation unit accepting packaging cardboard, PET bottles, and consumer appliances.',
+    acceptedWasteTypes: [
+      { category: 'plastic', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 17, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'metal', ratePerKg: 36, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'ewaste', ratePerKg: 62, acceptsDropoff: true, acceptsPickup: true }
+    ]
+  },
+  // 5. T. Nagar
+  {
+    _id: 'mem_col_5',
+    name: 'T. Nagar Urban E-Waste & Paper Depot',
+    district: 'T. Nagar',
+    zone: 'T. Nagar',
+    city: 'Chennai',
+    address: 'Usman Road, Near Panagal Park, T. Nagar, Chennai, Tamil Nadu 600017',
+    lat: 13.0418,
+    lng: 80.2341,
+    phone: '+91 94447 88901',
+    email: 'tnagar.depot@chennairecycle.org',
+    tnpcbRegNo: 'TNPCB/CHN/TNG/2022/4510',
+    rating: 4.7,
+    totalReviews: 104,
+    operatingHours: '09:00 AM - 08:30 PM (Daily)',
+    capacityLoad: 60,
+    isVerified: true,
+    pointType: 'dealer',
+    serviceRadiusKm: 6,
+    serviceWards: ['T. Nagar', 'Pondy Bazaar', 'Kodambakkam', 'Teynampet', 'Nungambakkam'],
+    description: 'Commercial district depot in Central Chennai specialized in retail packaging, textile cutoffs, and electronic scrap.',
+    acceptedWasteTypes: [
+      { category: 'paper', ratePerKg: 16, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'ewaste', ratePerKg: 70, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'metal', ratePerKg: 39, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'textile', ratePerKg: 22, acceptsDropoff: true, acceptsPickup: true }
+    ]
+  },
+  // 6. Perungudi / OMR
+  {
+    _id: 'mem_col_6',
+    name: 'Perungudi - OMR Clean Resource Park',
+    district: 'Perungudi / OMR',
+    zone: 'Perungudi / OMR',
     city: 'Chennai',
     address: 'Near 200 Feet Radial Rd, Perungudi, Chennai, Tamil Nadu 600096',
     lat: 12.9698,
     lng: 80.2374,
     phone: '+91 97910 44321',
-    email: 'perungudi.green@ecovision.org',
+    email: 'perungudi.clean@ecovision.org',
     tnpcbRegNo: 'TNPCB/CHN/BIO/2024/1042',
     rating: 4.7,
     totalReviews: 87,
     operatingHours: '07:30 AM - 07:00 PM (Daily)',
     capacityLoad: 41,
     isVerified: true,
-    description: 'OMR corridor hub accepting residential segregated dry waste, compostable food scraps, and electronic scrap.',
+    pointType: 'dealer',
+    serviceRadiusKm: 9,
+    serviceWards: ['Perungudi', 'Thoraipakkam', 'Sholinganallur', 'Kandanchavadi', 'SRP Tools'],
+    description: 'IT Corridor circular hub servicing high-rise gated communities and IT tech parks with door-to-door green recovery.',
     acceptedWasteTypes: [
       { category: 'organic', ratePerKg: 5, acceptsDropoff: true, acceptsPickup: true },
       { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
@@ -216,431 +321,533 @@ export const SEED_COLLECTORS = [
       { category: 'glass', ratePerKg: 8, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
+  // 7. Manali
   {
-    name: 'Kodungaiyur Municipal Bio-Clean Center',
-    district: 'Chennai',
+    _id: 'mem_col_7',
+    name: 'Manali Industrial Secondary Polymer Hub',
+    district: 'Manali',
+    zone: 'Manali',
     city: 'Chennai',
-    address: 'T.H. Road, Kodungaiyur, North Chennai, Tamil Nadu 600118',
-    lat: 13.1415,
-    lng: 80.2625,
+    address: 'Manali Express Highway, North Chennai, Tamil Nadu 600068',
+    lat: 13.1670,
+    lng: 80.2600,
     phone: '+91 94445 67890',
-    email: 'kodungaiyur.clean@chennaicorporation.gov.in',
-    tnpcbRegNo: 'TNPCB/CHN/MUN/2021/3342',
+    email: 'manali.polymers@chennaicorporation.gov.in',
+    tnpcbRegNo: 'TNPCB/CHN/MNL/2021/3342',
     rating: 4.6,
     totalReviews: 76,
-    operatingHours: '07:00 AM - 06:00 PM (Daily)',
+    operatingHours: '07:00 AM - 06:00 PM (Mon-Sat)',
     capacityLoad: 68,
     isVerified: true,
-    description: 'North Chennai centralized processing facility for organic biomethanation and heavy plastic recycling.',
+    pointType: 'dealer',
+    serviceRadiusKm: 12,
+    serviceWards: ['Manali', 'Madhavaram', 'Ennore', 'Tiruvottiyur', 'Kathivakkam'],
+    description: 'Heavy industrial zone reprocessing hub equipped with high-capacity balers, granulators, and wash lines.',
     acceptedWasteTypes: [
-      { category: 'organic', ratePerKg: 4, acceptsDropoff: true, acceptsPickup: false },
-      { category: 'plastic', ratePerKg: 17, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 13, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'hazardous', ratePerKg: 0, acceptsDropoff: true, acceptsPickup: false }
-    ]
-  },
-
-  // --- COIMBATORE ---
-  {
-    name: 'Peelamedu Tech Recyclers & E-Waste Hub',
-    district: 'Coimbatore',
-    city: 'Coimbatore',
-    address: 'Avinashi Rd, Near PSG Tech, Peelamedu, Coimbatore, Tamil Nadu 641004',
-    lat: 11.0284,
-    lng: 77.0125,
-    phone: '+91 98940 12894',
-    email: 'peelamedu.tech@coimbatore-eco.com',
-    tnpcbRegNo: 'TNPCB/CBE/EW/2023/5021',
-    rating: 4.9,
-    totalReviews: 142,
-    operatingHours: '09:00 AM - 08:00 PM (Mon-Sat)',
-    capacityLoad: 33,
-    isVerified: true,
-    description: 'Coimbatore premier certified electronic waste dismantling and precious metal extraction center.',
-    acceptedWasteTypes: [
-      { category: 'ewaste', ratePerKg: 70, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'metal', ratePerKg: 42, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-  {
-    name: 'Kurichi SIDCO Clean Energy & Plastics Facility',
-    district: 'Coimbatore',
-    city: 'Coimbatore',
-    address: 'Phase II, Kurichi SIDCO Industrial Area, Coimbatore, Tamil Nadu 641021',
-    lat: 10.9416,
-    lng: 76.9692,
-    phone: '+91 94432 99811',
-    email: 'kurichi.sidco@tnpcb-partner.org',
-    tnpcbRegNo: 'TNPCB/CBE/IND/2022/1908',
-    rating: 4.8,
-    totalReviews: 105,
-    operatingHours: '08:00 AM - 07:00 PM (Mon-Sat)',
-    capacityLoad: 46,
-    isVerified: true,
-    description: 'Industrial scrap collection specializing in foundry sand, steel offcuts, and heavy HDPE plastics.',
-    acceptedWasteTypes: [
-      { category: 'metal', ratePerKg: 45, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'textile', ratePerKg: 22, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-  {
-    name: 'Gandhipuram Bio-Compost & Civic MRF',
-    district: 'Coimbatore',
-    city: 'Coimbatore',
-    address: 'Cross Cut Road, Gandhipuram, Coimbatore, Tamil Nadu 641012',
-    lat: 11.0168,
-    lng: 76.9674,
-    phone: '+91 98422 66543',
-    email: 'gandhipuram.mrf@cbecity.gov.in',
-    tnpcbRegNo: 'TNPCB/CBE/MUN/2024/0912',
-    rating: 4.7,
-    totalReviews: 89,
-    operatingHours: '07:00 AM - 07:00 PM (Daily)',
-    capacityLoad: 58,
-    isVerified: true,
-    description: 'Centrally located city center drop-off depot for organic food leftovers, bottles, and cardboard.',
-    acceptedWasteTypes: [
-      { category: 'organic', ratePerKg: 5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'glass', ratePerKg: 9, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 17, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-
-  // --- MADURAI ---
-  {
-    name: 'Mattuthavani Central Resource Recovery Hub',
-    district: 'Madurai',
-    city: 'Madurai',
-    address: 'Near Integrated Bus Terminus, Mattuthavani, Madurai, Tamil Nadu 625007',
-    lat: 9.9482,
-    lng: 78.1566,
-    phone: '+91 94431 87234',
-    email: 'mattuthavani.recovery@maduraicorp.tn.gov.in',
-    tnpcbRegNo: 'TNPCB/MDU/REG/2023/4412',
-    rating: 4.8,
-    totalReviews: 119,
-    operatingHours: '07:30 AM - 07:30 PM (Daily)',
-    capacityLoad: 44,
-    isVerified: true,
-    description: 'Madurai major multimodal recovery hub managing segregated plastics, packaging, and commercial waste.',
-    acceptedWasteTypes: [
-      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'metal', ratePerKg: 36, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'ewaste', ratePerKg: 52, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-  {
-    name: 'Kappalur SIDCO Metal & Polymers Depot',
-    district: 'Madurai',
-    city: 'Madurai',
-    address: 'Sector 4, Kappalur Industrial Estate, Madurai, Tamil Nadu 625008',
-    lat: 9.8517,
-    lng: 78.0583,
-    phone: '+91 98430 77123',
-    email: 'kappalur.sidco@madurairecycling.in',
-    tnpcbRegNo: 'TNPCB/MDU/IND/2022/6721',
-    rating: 4.7,
-    totalReviews: 67,
-    operatingHours: '08:30 AM - 06:30 PM (Mon-Sat)',
-    capacityLoad: 39,
-    isVerified: true,
-    description: 'Industrial grade recycling facility handling heavy vehicle scrap, industrial drum plastics, and tires.',
-    acceptedWasteTypes: [
+      { category: 'plastic', ratePerKg: 21, acceptsDropoff: true, acceptsPickup: true },
       { category: 'metal', ratePerKg: 42, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
       { category: 'hazardous', ratePerKg: 0, acceptsDropoff: true, acceptsPickup: false }
     ]
   },
-
-  // --- TIRUCHIRAPPALLI (TRICHY) ---
+  // 8. Mylapore
   {
-    name: 'Ariyamangalam Green Material Recovery Facility',
-    district: 'Tiruchirappalli',
-    city: 'Trichy',
-    address: 'Tanjore Main Road, Ariyamangalam, Trichy, Tamil Nadu 620010',
-    lat: 10.8035,
-    lng: 78.7185,
-    phone: '+91 94433 11290',
-    email: 'ariyamangalam.mrf@trichycorp.gov.in',
-    tnpcbRegNo: 'TNPCB/TRY/MUN/2023/1209',
+    _id: 'mem_col_8',
+    name: 'Mylapore Heritage Resource & Scrap Aggregator',
+    district: 'Mylapore',
+    zone: 'Mylapore',
+    city: 'Chennai',
+    address: 'Luz Church Road, Mylapore, Chennai, Tamil Nadu 600004',
+    lat: 13.0368,
+    lng: 80.2676,
+    phone: '+91 98403 12908',
+    email: 'mylapore.aggregator@chennairecycle.org',
+    tnpcbRegNo: 'TNPCB/CHN/MYL/2023/5120',
     rating: 4.8,
-    totalReviews: 83,
-    operatingHours: '08:00 AM - 07:00 PM (Daily)',
-    capacityLoad: 47,
-    isVerified: true,
-    description: 'Remediated eco-park processing residential segregation, PET bottles, organic wet composting, and glass.',
-    acceptedWasteTypes: [
-      { category: 'organic', ratePerKg: 4, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'glass', ratePerKg: 8, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-  {
-    name: 'Thuvakudi Heavy Industrial Recyclers',
-    district: 'Tiruchirappalli',
-    city: 'Trichy',
-    address: 'Near BHEL Township, Thuvakudi SIDCO, Trichy, Tamil Nadu 620015',
-    lat: 10.7554,
-    lng: 78.7997,
-    phone: '+91 97900 88214',
-    email: 'thuvakudi.bhel@trichyindustries.org',
-    tnpcbRegNo: 'TNPCB/TRY/IND/2022/9831',
-    rating: 4.9,
-    totalReviews: 95,
-    operatingHours: '09:00 AM - 06:30 PM (Mon-Sat)',
-    capacityLoad: 31,
-    isVerified: true,
-    description: 'Heavy fabrication alloy recovery, electric cable granulation, and transformer e-waste processing.',
-    acceptedWasteTypes: [
-      { category: 'metal', ratePerKg: 46, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'ewaste', ratePerKg: 62, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-
-  // --- SALEM ---
-  {
-    name: 'Shevapet Scrap & Circularity Guild',
-    district: 'Salem',
-    city: 'Salem',
-    address: 'Market Street, Shevapet, Salem, Tamil Nadu 636002',
-    lat: 11.6492,
-    lng: 78.1408,
-    phone: '+91 94421 77654',
-    email: 'shevapet.scrap@salem-recycle.in',
-    tnpcbRegNo: 'TNPCB/SLM/TRADE/2023/3419',
-    rating: 4.7,
-    totalReviews: 110,
-    operatingHours: '08:00 AM - 08:00 PM (Mon-Sat)',
-    capacityLoad: 55,
-    isVerified: true,
-    description: 'Historic recycling trading hub specializing in aluminum, iron, brass vessels, and paper baling.',
-    acceptedWasteTypes: [
-      { category: 'metal', ratePerKg: 44, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'ewaste', ratePerKg: 50, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-  {
-    name: 'Jagir Ammapalayam Clean Eco Station',
-    district: 'Salem',
-    city: 'Salem',
-    address: 'Near Omalur Main Rd, Jagir Ammapalayam, Salem, Tamil Nadu 636302',
-    lat: 11.6743,
-    lng: 78.1251,
-    phone: '+91 98427 33419',
-    email: 'ammapalayam@salemcorp.gov.in',
-    tnpcbRegNo: 'TNPCB/SLM/MUN/2024/7710',
-    rating: 4.8,
-    totalReviews: 62,
-    operatingHours: '07:30 AM - 06:30 PM (Daily)',
-    capacityLoad: 35,
-    isVerified: true,
-    description: 'Urban municipal segregated station accepting bio-waste, plastic bottles, and glass jars.',
-    acceptedWasteTypes: [
-      { category: 'organic', ratePerKg: 4.5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 17.5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'glass', ratePerKg: 8.5, acceptsDropoff: true, acceptsPickup: false }
-    ]
-  },
-
-  // --- TIRUNELVELI ---
-  {
-    name: 'Thachanallur Bio-Park & Recyclers',
-    district: 'Tirunelveli',
-    city: 'Tirunelveli',
-    address: 'Madurai Road, Thachanallur, Tirunelveli, Tamil Nadu 627358',
-    lat: 8.7495,
-    lng: 77.7289,
-    phone: '+91 94434 55678',
-    email: 'thachanallur@nellai-green.org',
-    tnpcbRegNo: 'TNPCB/TNV/BIO/2023/1820',
-    rating: 4.8,
-    totalReviews: 73,
+    totalReviews: 72,
     operatingHours: '08:00 AM - 07:00 PM (Daily)',
     capacityLoad: 36,
     isVerified: true,
-    description: 'South Tamil Nadu flagship bio-composting and plastic recovery center on the banks of Thamirabarani.',
+    pointType: 'dealer',
+    serviceRadiusKm: 6,
+    serviceWards: ['Mylapore', 'Mandaveli', 'Alwarpet', 'Royapettah', 'Santhome'],
+    description: 'Historic cultural district recovery station collecting brass, copper utensils, paper bundles, and clean bottles.',
     acceptedWasteTypes: [
-      { category: 'organic', ratePerKg: 4, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'metal', ratePerKg: 42, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 16, acceptsDropoff: true, acceptsPickup: true },
       { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 13, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'ewaste', ratePerKg: 48, acceptsDropoff: true, acceptsPickup: true }
+      { category: 'glass', ratePerKg: 9, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
+  // 9. Porur
   {
-    name: 'Palayamkottai Civic Segregation Center',
-    district: 'Tirunelveli',
-    city: 'Tirunelveli',
-    address: 'Trivandrum High Rd, Palayamkottai, Tirunelveli, Tamil Nadu 627002',
-    lat: 8.7139,
-    lng: 77.7470,
-    phone: '+91 98421 99014',
-    email: 'palayamkottai.eco@nellai.gov.in',
-    tnpcbRegNo: 'TNPCB/TNV/MUN/2022/4119',
-    rating: 4.7,
-    totalReviews: 54,
-    operatingHours: '08:30 AM - 06:30 PM (Mon-Sat)',
+    _id: 'mem_col_9',
+    name: 'Porur - Vadapalani Circularity Center',
+    district: 'Porur',
+    zone: 'Porur',
+    city: 'Chennai',
+    address: 'Mount-Poonamallee High Road, Porur, Chennai, Tamil Nadu 600116',
+    lat: 13.0382,
+    lng: 80.1565,
+    phone: '+91 97908 65432',
+    email: 'porur.circular@ecovision.org',
+    tnpcbRegNo: 'TNPCB/CHN/POR/2024/7741',
+    rating: 4.8,
+    totalReviews: 81,
+    operatingHours: '08:00 AM - 07:00 PM (Mon-Sat)',
     capacityLoad: 42,
     isVerified: true,
-    description: 'Convenient center for academic books, paper archives, glass containers, and domestic dry waste.',
+    pointType: 'dealer',
+    serviceRadiusKm: 8,
+    serviceWards: ['Porur', 'Vadapalani', 'Valasaravakkam', 'Ramapuram', 'Kattupakkam'],
+    description: 'South-West Chennai gateway aggregator serving commercial retail and residential complexes with mobile collection vans.',
     acceptedWasteTypes: [
-      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 17, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'glass', ratePerKg: 8, acceptsDropoff: true, acceptsPickup: true }
-    ]
-  },
-
-  // --- TIRUPPUR ---
-  {
-    name: 'Tiruppur Circular Textile & Yarn Recovery Unit',
-    district: 'Tiruppur',
-    city: 'Tiruppur',
-    address: 'Veerapandi Industrial Estate, Palladam Rd, Tiruppur, Tamil Nadu 641605',
-    lat: 11.0664,
-    lng: 77.3411,
-    phone: '+91 98432 11987',
-    email: 'textilerecovery@tiruppur-knit.org',
-    tnpcbRegNo: 'TNPCB/TPR/TEX/2023/8891',
-    rating: 4.9,
-    totalReviews: 138,
-    operatingHours: '08:00 AM - 08:00 PM (Mon-Sat)',
-    capacityLoad: 58,
-    isVerified: true,
-    description: 'Premier hosiery waste & fabric offcut recycling converting cotton fibers into OE yarn and insulation.',
-    acceptedWasteTypes: [
-      { category: 'textile', ratePerKg: 28, acceptsDropoff: true, acceptsPickup: true },
       { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true }
+      { category: 'metal', ratePerKg: 37, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'ewaste', ratePerKg: 58, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
-
-  // --- VELLORE ---
+  // 10. Royapuram
   {
-    name: 'Ranipet & Katpadi Industrial Waste Consortium',
-    district: 'Vellore',
-    city: 'Vellore',
-    address: 'Near Katpadi Junction, Ranipet Road, Vellore, Tamil Nadu 632007',
-    lat: 12.9734,
-    lng: 79.1325,
-    phone: '+91 94435 66782',
-    email: 'vellore.consortium@tnpcb-ranipet.org',
-    tnpcbRegNo: 'TNPCB/VEL/IND/2023/5541',
+    _id: 'mem_col_10',
+    name: 'Royapuram Port Marine Plastics & Scrap Works',
+    district: 'Royapuram',
+    zone: 'Royapuram',
+    city: 'Chennai',
+    address: 'SN Chetty Street, Near Port Gate 5, Royapuram, Chennai, Tamil Nadu 600013',
+    lat: 13.1120,
+    lng: 80.2950,
+    phone: '+91 94440 33819',
+    email: 'royapuram.marine@chennairecycle.org',
+    tnpcbRegNo: 'TNPCB/CHN/ROY/2023/2099',
     rating: 4.7,
-    totalReviews: 82,
-    operatingHours: '08:30 AM - 06:30 PM (Mon-Sat)',
-    capacityLoad: 49,
+    totalReviews: 65,
+    operatingHours: '07:30 AM - 06:30 PM (Mon-Sat)',
+    capacityLoad: 50,
     isVerified: true,
-    description: 'Industrial estate facility specializing in safe chemical container neutralizing, metals, and e-waste.',
+    pointType: 'dealer',
+    serviceRadiusKm: 7,
+    serviceWards: ['Royapuram', 'George Town', 'Parrys', 'Kasimedu', 'Washermanpet'],
+    description: 'Port-side recovery station specialized in discarded marine nylon nets, rigid maritime plastics, and heavy steel ropes.',
     acceptedWasteTypes: [
-      { category: 'metal', ratePerKg: 40, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'ewaste', ratePerKg: 58, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'hazardous', ratePerKg: 0, acceptsDropoff: true, acceptsPickup: false },
-      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true }
+      { category: 'plastic', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'metal', ratePerKg: 45, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'textile', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
-
-  // --- ERODE ---
+  // 11. Tambaram
   {
-    name: 'Perundurai SIPCOT Green Technology Center',
-    district: 'Erode',
-    city: 'Erode',
-    address: 'SIPCOT Industrial Growth Estate, Perundurai, Erode, Tamil Nadu 638052',
-    lat: 11.2789,
-    lng: 77.5847,
-    phone: '+91 98425 44102',
-    email: 'perundurai.sipcot@erode-eco.gov.in',
-    tnpcbRegNo: 'TNPCB/ERD/SIP/2023/3109',
+    _id: 'mem_col_11',
+    name: 'Tambaram South Gateway MRF Station',
+    district: 'Tambaram',
+    zone: 'Tambaram',
+    city: 'Chennai',
+    address: 'GST Road, Near Sanatorium, Tambaram, Chennai, Tamil Nadu 600045',
+    lat: 12.9249,
+    lng: 80.1000,
+    phone: '+91 98404 99182',
+    email: 'tambaram.mrf@chennaicorporation.gov.in',
+    tnpcbRegNo: 'TNPCB/CHN/TAM/2023/6410',
     rating: 4.8,
-    totalReviews: 78,
-    operatingHours: '08:00 AM - 07:00 PM (Mon-Sat)',
-    capacityLoad: 43,
+    totalReviews: 92,
+    operatingHours: '08:00 AM - 07:00 PM (Daily)',
+    capacityLoad: 45,
     isVerified: true,
-    description: 'Comprehensive industrial ecology hub accepting textile clippings, heavy polymers, and bio-waste.',
+    pointType: 'dealer',
+    serviceRadiusKm: 12,
+    serviceWards: ['Tambaram', 'Pallavaram', 'Chromepet', 'Sanatorium', 'Perungalathur'],
+    description: 'South Chennai junction facility connecting suburban wards to certified recycling plants with automated weighbridge.',
     acceptedWasteTypes: [
-      { category: 'textile', ratePerKg: 24, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'organic', ratePerKg: 4.5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'metal', ratePerKg: 39, acceptsDropoff: true, acceptsPickup: true }
+      { category: 'plastic', ratePerKg: 18, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'metal', ratePerKg: 36, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'organic', ratePerKg: 4, acceptsDropoff: true, acceptsPickup: true }
     ]
   },
-
-  // --- THANJAVUR ---
+  // 12. Velachery
   {
-    name: 'Pillaiyarpatti Delta Agro & Material Recyclers',
-    district: 'Thanjavur',
-    city: 'Thanjavur',
-    address: 'Trichy Main Rd, Pillaiyarpatti, Thanjavur, Tamil Nadu 613403',
-    lat: 10.7684,
-    lng: 79.1174,
-    phone: '+91 94437 22891',
-    email: 'delta.recyclers@thanjavur.tn.gov.in',
-    tnpcbRegNo: 'TNPCB/TNJ/AGR/2024/1105',
-    rating: 4.8,
-    totalReviews: 61,
-    operatingHours: '08:00 AM - 06:30 PM (Daily)',
-    capacityLoad: 37,
+    _id: 'mem_col_12',
+    name: 'Velachery Urban Biomethanation & Scrap Station',
+    district: 'Velachery',
+    zone: 'Velachery',
+    city: 'Chennai',
+    address: 'Taramani 100 Feet Road, Velachery, Chennai, Tamil Nadu 600042',
+    lat: 12.9750,
+    lng: 80.2210,
+    phone: '+91 97911 55667',
+    email: 'velachery.station@ecovision.org',
+    tnpcbRegNo: 'TNPCB/CHN/VEL/2024/3011',
+    rating: 4.9,
+    totalReviews: 108,
+    operatingHours: '07:30 AM - 07:30 PM (Daily)',
+    capacityLoad: 40,
     isVerified: true,
-    description: 'Cauvery delta agro-residue biomass processor and civic cardboard/plastic recovery hub.',
+    pointType: 'dealer',
+    serviceRadiusKm: 7,
+    serviceWards: ['Velachery', 'Madipakkam', 'Adambakkam', 'Taramani', 'Ullagaram'],
+    description: 'GCC Zone 13 modern resource center featuring bio-gas generation from wet waste and high-speed dry recyclables sorting.',
     acceptedWasteTypes: [
       { category: 'organic', ratePerKg: 5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 14, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 17, acceptsDropoff: true, acceptsPickup: true }
+      { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'paper', ratePerKg: 16, acceptsDropoff: true, acceptsPickup: true },
+      { category: 'ewaste', ratePerKg: 60, acceptsDropoff: true, acceptsPickup: true }
     ]
-  },
+  }
+];
 
-  // --- KANCHIPURAM ---
+// Chennai Industrial Recycling Factories (Buyers)
+export const SEED_FACTORIES = [
   {
-    name: 'Sriperumbudur Hi-Tech Electronics Recyclers',
-    district: 'Kanchipuram',
-    city: 'Kanchipuram',
-    address: 'SIPCOT Industrial Park, Sriperumbudur, Tamil Nadu 602105',
+    _id: 'fac_manali_1',
+    factoryId: 'fac_manali_1',
+    name: 'Manali Eco-Polymers Ltd',
+    district: 'Manali',
+    zone: 'Manali',
+    city: 'Chennai',
+    address: 'Expressway Petrochemical Complex, Manali, Chennai 600068',
+    lat: 13.1670,
+    lng: 80.2600,
+    phone: '+91 98402 99887',
+    email: 'procurement@manalieco.com',
+    pointType: 'factory',
+    primaryCategory: 'plastic',
+    openDemands: 'PET & HDPE Flakes (5,000 kg @ ₹22/kg)',
+    description: 'Specialized industrial recycling plant producing synthetic rPET resin and polyester fiber.',
+    tnpcbRegNo: 'TNPCB/CHN/FAC/2022/9011'
+  },
+  {
+    _id: 'fac_guindy_metal_1',
+    factoryId: 'fac_guindy_metal_1',
+    name: 'Guindy Precision Metallics & Alloys',
+    district: 'Guindy',
+    zone: 'Guindy',
+    city: 'Chennai',
+    address: 'Plot 18, SIDCO Industrial Estate, Guindy, Chennai 600032',
+    lat: 13.0110,
+    lng: 80.2080,
+    phone: '+91 94441 88990',
+    email: 'sourcing@guindymetals.in',
+    pointType: 'factory',
+    primaryCategory: 'metal',
+    openDemands: 'Aluminum Cans & Copper Shred (3,000 kg @ ₹48/kg)',
+    description: 'Foundry secondary smelting facility producing automotive aluminum ingots.',
+    tnpcbRegNo: 'TNPCB/CHN/FAC/2021/4412'
+  },
+  {
+    _id: 'fac_ambattur_paper_1',
+    factoryId: 'fac_ambattur_paper_1',
+    name: 'Ambattur Corrugated & Kraft Repulping Mills',
+    district: 'Ambattur',
+    zone: 'Ambattur',
+    city: 'Chennai',
+    address: 'Ambattur Industrial Estate 3rd Phase, Chennai 600058',
+    lat: 13.1180,
+    lng: 80.1600,
+    phone: '+91 98403 66771',
+    email: 'rawmaterials@ambatturkraft.com',
+    pointType: 'factory',
+    primaryCategory: 'paper',
+    openDemands: 'OCC Grade 11 Kraft Cartons (8,000 kg @ ₹16.5/kg)',
+    description: 'Continuous hydropulping paper mill utilizing 100% recovered corrugated cardboard.',
+    tnpcbRegNo: 'TNPCB/CHN/FAC/2023/1820'
+  },
+  {
+    _id: 'fac_sriperumbudur_ewaste_1',
+    factoryId: 'fac_sriperumbudur_ewaste_1',
+    name: 'Sriperumbudur High-Tech Electronic Recyclers',
+    district: 'Sriperumbudur',
+    zone: 'Sriperumbudur',
+    city: 'Chennai',
+    address: 'SIPCOT Industrial Park, Chennai West 602105',
     lat: 12.9675,
     lng: 79.9431,
     phone: '+91 97909 33214',
-    email: 'sriperumbudur.ewaste@greentech.org',
-    tnpcbRegNo: 'TNPCB/KPM/EW/2023/7788',
-    rating: 4.9,
-    totalReviews: 124,
-    operatingHours: '08:30 AM - 07:30 PM (Mon-Sat)',
-    capacityLoad: 40,
-    isVerified: true,
-    description: 'Electronics manufacturing corridor hub for high-grade server scrap, printed circuit boards, and lead-acid batteries.',
-    acceptedWasteTypes: [
-      { category: 'ewaste', ratePerKg: 72, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'metal', ratePerKg: 43, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 20, acceptsDropoff: true, acceptsPickup: true }
-    ]
+    email: 'ewaste@sriperumbudur-tech.in',
+    pointType: 'factory',
+    primaryCategory: 'ewaste',
+    openDemands: 'PCB Boards & Copper Core Cables (2,000 kg @ ₹68/kg)',
+    description: 'High-tech e-waste dismantling, precious metals extraction and refining complex.',
+    tnpcbRegNo: 'TNPCB/CHN/FAC/2023/7788'
   },
-
-  // --- DINDIGUL ---
   {
-    name: 'Dindigul Nagal Nagar Clean Material Depot',
-    district: 'Dindigul',
-    city: 'Dindigul',
-    address: 'Bypass Road, Nagal Nagar, Dindigul, Tamil Nadu 624003',
-    lat: 10.3673,
-    lng: 77.9803,
-    phone: '+91 94429 88120',
-    email: 'dindigul.depot@tn-clean.in',
-    tnpcbRegNo: 'TNPCB/DGL/MUN/2023/2219',
-    rating: 4.7,
-    totalReviews: 59,
-    operatingHours: '08:00 AM - 06:30 PM (Mon-Sat)',
-    capacityLoad: 41,
-    isVerified: true,
-    description: 'Dindigul central collection center for metal scraps, lock industry offcuts, and plastic recycling.',
-    acceptedWasteTypes: [
-      { category: 'metal', ratePerKg: 42, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'plastic', ratePerKg: 17.5, acceptsDropoff: true, acceptsPickup: true },
-      { category: 'paper', ratePerKg: 13.5, acceptsDropoff: true, acceptsPickup: true }
-    ]
+    _id: 'fac_ennore_glass_1',
+    factoryId: 'fac_ennore_glass_1',
+    name: 'Ennore Green Glass & Cullet Works',
+    district: 'Ennore',
+    zone: 'Ennore',
+    city: 'Chennai',
+    address: 'Ennore Express Highway, North Chennai 600057',
+    lat: 13.2010,
+    lng: 80.3150,
+    phone: '+91 94444 11200',
+    email: 'cullet@ennoreglass.org',
+    pointType: 'factory',
+    primaryCategory: 'glass',
+    openDemands: 'Flint & Amber Container Cullet (10,000 kg @ ₹9/kg)',
+    description: 'Automated glass remelting furnace producing bottles and vials with infinite recycling efficiency.',
+    tnpcbRegNo: 'TNPCB/CHN/FAC/2024/0029'
+  }
+];
+
+export const SEED_USERS = [
+  {
+    _id: 'usr_customer_1',
+    name: 'Kavitha Ramachandran',
+    email: 'customer@ecovision.tn',
+    password: '$2b$10$xEi7ez64xAItubrnj69yveD7wo59noW9gInpq/KfKjF5e.NeDZIRC', // pass123
+    role: 'customer',
+    phone: '+91 98401 23456',
+    district: 'Anna Nagar',
+    address: '14, 2nd Main Road, Anna Nagar, Chennai 600040'
+  },
+  {
+    _id: 'usr_dealer_1',
+    name: 'Rajesh Selvam (Guindy Eco-Recovery)',
+    email: 'dealer@ecovision.tn',
+    password: '$2b$10$xEi7ez64xAItubrnj69yveD7wo59noW9gInpq/KfKjF5e.NeDZIRC', // pass123
+    role: 'dealer',
+    phone: '+91 94441 23489',
+    district: 'Guindy',
+    address: 'Plot 42, SIDCO Industrial Estate, Guindy, Chennai 600032',
+    facilityName: 'Guindy Eco-Recovery Industrial Hub',
+    facilityId: 'mem_col_1',
+    serviceRadiusKm: 8,
+    serviceWards: ['Guindy', 'Saidapet', 'Alandur', 'Ekkatuthangal', 'Jafferkhanpet'],
+    lat: 13.0067,
+    lng: 80.2012
+  },
+  {
+    _id: 'usr_factory_1',
+    name: 'Anand Kumar (Manali Eco-Polymers Ltd)',
+    email: 'factory@ecovision.tn',
+    password: '$2b$10$xEi7ez64xAItubrnj69yveD7wo59noW9gInpq/KfKjF5e.NeDZIRC', // pass123
+    role: 'factory',
+    phone: '+91 98402 99887',
+    district: 'Manali',
+    address: 'Expressway Petrochemical Complex, Manali, Chennai 600068',
+    facilityName: 'Manali Eco-Polymers Ltd',
+    facilityId: 'fac_manali_1',
+    lat: 13.1670,
+    lng: 80.2600
+  },
+  {
+    _id: 'usr_admin_1',
+    name: 'Dr. S. Meenakshi (GCC City Environmental Officer)',
+    email: 'admin@ecovision.tn',
+    password: '$2b$10$xEi7ez64xAItubrnj69yveD7wo59noW9gInpq/KfKjF5e.NeDZIRC', // pass123
+    role: 'admin',
+    phone: '+91 44 2538 4145',
+    district: 'Chennai Central',
+    address: 'Greater Chennai Corporation (GCC), Ripon Building, Chennai 600003',
+    facilityName: 'Greater Chennai Corporation & TNPCB Joint Directorate'
+  }
+];
+
+export const SEED_INVENTORY = [
+  {
+    _id: 'inv_1',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'plastic',
+    availableKg: 2450,
+    totalCollectedKg: 3200,
+    totalDispatchedKg: 750,
+    lastCollectedAt: new Date(Date.now() - 3600000 * 2)
+  },
+  {
+    _id: 'inv_2',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'metal',
+    availableKg: 1850,
+    totalCollectedKg: 2400,
+    totalDispatchedKg: 550,
+    lastCollectedAt: new Date(Date.now() - 3600000 * 5)
+  },
+  {
+    _id: 'inv_3',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'paper',
+    availableKg: 3100,
+    totalCollectedKg: 4200,
+    totalDispatchedKg: 1100,
+    lastCollectedAt: new Date(Date.now() - 3600000 * 12)
+  },
+  {
+    _id: 'inv_4',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'ewaste',
+    availableKg: 420,
+    totalCollectedKg: 420,
+    totalDispatchedKg: 0,
+    lastCollectedAt: new Date(Date.now() - 3600000 * 24)
+  },
+  {
+    _id: 'inv_5',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'textile',
+    availableKg: 1600,
+    totalCollectedKg: 2000,
+    totalDispatchedKg: 400,
+    lastCollectedAt: new Date(Date.now() - 3600000 * 8)
+  }
+];
+
+export const SEED_REQUIREMENTS = [
+  {
+    _id: 'req_1',
+    requirementId: 'REQ-CHN-101',
+    factoryId: 'fac_manali_1',
+    factoryName: 'Manali Eco-Polymers Ltd',
+    category: 'plastic',
+    grade: 'Clean PET / HDPE Flakes (>98% Purity)',
+    quantityNeededKg: 5000,
+    fulfilledKg: 1500,
+    offeredPricePerKg: 22,
+    district: 'Manali',
+    deliveryAddress: 'Expressway Petrochemical Complex, Manali, Chennai 600068',
+    deadline: '2026-11-15',
+    status: 'open',
+    notes: 'Urgent demand for recycled polyester filament manufacturing.'
+  },
+  {
+    _id: 'req_2',
+    requirementId: 'REQ-CHN-102',
+    factoryId: 'fac_guindy_metal_1',
+    factoryName: 'Guindy Precision Metallics & Alloys',
+    category: 'metal',
+    grade: 'Clean Aluminum Cans & Copper Wire Shred',
+    quantityNeededKg: 3000,
+    fulfilledKg: 800,
+    offeredPricePerKg: 48,
+    district: 'Guindy',
+    deliveryAddress: 'SIDCO Industrial Estate, Guindy, Chennai 600032',
+    deadline: '2026-11-30',
+    status: 'open',
+    notes: 'Secondary smelting for precision automotive castings.'
+  },
+  {
+    _id: 'req_3',
+    requirementId: 'REQ-CHN-103',
+    factoryId: 'fac_ambattur_paper_1',
+    factoryName: 'Ambattur Corrugated & Kraft Repulping',
+    category: 'paper',
+    grade: 'Old Corrugated Cartons (OCC Grade 11)',
+    quantityNeededKg: 8000,
+    fulfilledKg: 2500,
+    offeredPricePerKg: 16.5,
+    district: 'Ambattur',
+    deliveryAddress: 'Ambattur Industrial Estate 3rd Phase, Chennai 600058',
+    deadline: '2026-11-20',
+    status: 'open',
+    notes: 'Direct feed for industrial packaging paperboard mills.'
+  },
+  {
+    _id: 'req_4',
+    requirementId: 'REQ-CHN-104',
+    factoryId: 'fac_sriperumbudur_ewaste_1',
+    factoryName: 'Sriperumbudur Electronic Recyclers',
+    category: 'ewaste',
+    grade: 'Class-A Circuit Boards & Copper Cables',
+    quantityNeededKg: 2000,
+    fulfilledKg: 0,
+    offeredPricePerKg: 68,
+    district: 'Sriperumbudur',
+    deliveryAddress: 'SIPCOT Industrial Park, Chennai West 602105',
+    deadline: '2026-12-05',
+    status: 'open',
+    notes: 'Precious metal recovery for electronics supply chains.'
+  }
+];
+
+export const SEED_PURCHASE_ORDERS = [
+  {
+    _id: 'po_1',
+    poNumber: 'PO-CHN-8011',
+    requirementId: 'REQ-CHN-101',
+    factoryId: 'fac_manali_1',
+    factoryName: 'Manali Eco-Polymers Ltd',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'plastic',
+    quantityKg: 1500,
+    unitPrice: 22,
+    totalAmount: 33000,
+    status: 'verified',
+    vehicleNumber: 'TN 09 BX 4412 (10-Ton Eicher)',
+    dispatchDate: '2026-10-15',
+    verifiedWeightKg: 1485,
+    qualityGrade: 'Grade A+ (99.1% Purity)',
+    verificationNotes: 'Sample moisture < 1.2%, passed Chennai port spectrometer inspection.',
+    verifiedAt: new Date(Date.now() - 3600000 * 48),
+    paymentStatus: 'paid',
+    paymentRef: 'NEFT-RBI-20261015-881920',
+    paymentReleasedAt: new Date(Date.now() - 3600000 * 24),
+    createdAt: new Date(Date.now() - 3600000 * 72)
+  },
+  {
+    _id: 'po_2',
+    poNumber: 'PO-CHN-8012',
+    requirementId: 'REQ-CHN-102',
+    factoryId: 'fac_guindy_metal_1',
+    factoryName: 'Guindy Precision Metallics & Alloys',
+    dealerId: 'mem_col_1',
+    dealerName: 'Guindy Eco-Recovery Industrial Hub',
+    category: 'metal',
+    quantityKg: 800,
+    unitPrice: 48,
+    totalAmount: 38400,
+    status: 'shipped',
+    vehicleNumber: 'TN 22 Q 9122 (Mahindra Bolero Pickup)',
+    dispatchDate: '2026-10-18',
+    verifiedWeightKg: 0,
+    qualityGrade: 'In Transit',
+    verificationNotes: '',
+    paymentStatus: 'unpaid',
+    createdAt: new Date(Date.now() - 3600000 * 6)
+  }
+];
+
+export const SEED_AUDIT_LOGS = [
+  {
+    _id: 'log_1',
+    action: 'SYSTEM_BOOT',
+    category: 'ADMIN',
+    actorId: 'usr_admin_1',
+    actorName: 'Dr. S. Meenakshi',
+    actorRole: 'admin',
+    targetResource: 'EcoVision Chennai Core',
+    targetId: 'SYS_INIT_CHN',
+    details: 'EcoVision Chennai circular resource platform initialized for Greater Chennai Corporation (GCC) wards.',
+    timestamp: new Date(Date.now() - 3600000 * 120)
+  },
+  {
+    _id: 'log_2',
+    action: 'REQUIREMENT_PUBLISHED',
+    category: 'MARKETPLACE',
+    actorId: 'usr_factory_1',
+    actorName: 'Manali Eco-Polymers Ltd',
+    actorRole: 'factory',
+    targetResource: 'MaterialRequirement',
+    targetId: 'REQ-CHN-101',
+    details: 'Published demand for 5,000 kg HDPE/PET plastic flakes at ₹22/kg in Manali Industrial Belt.',
+    timestamp: new Date(Date.now() - 3600000 * 96)
+  },
+  {
+    _id: 'log_3',
+    action: 'PURCHASE_ORDER_VERIFIED',
+    category: 'PAYMENT',
+    actorId: 'usr_factory_1',
+    actorName: 'Manali Eco-Polymers Ltd',
+    actorRole: 'factory',
+    targetResource: 'PurchaseOrder',
+    targetId: 'PO-CHN-8011',
+    details: 'Verified 1,485 kg plastic shipment from Guindy Eco-Recovery Hub. Disbursed ₹32,670 payment.',
+    timestamp: new Date(Date.now() - 3600000 * 24)
   }
 ];

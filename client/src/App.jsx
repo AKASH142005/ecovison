@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import WasteTypeFilter from './components/WasteTypeFilter';
-import QuickDistrictSelector, { TN_DISTRICT_COORDINATES } from './components/QuickDistrictSelector';
+import QuickDistrictSelector, { CHENNAI_ZONE_COORDINATES } from './components/QuickDistrictSelector';
 import TamilNaduMap from './components/TamilNaduMap';
 import CollectorList from './components/CollectorList';
 import NavigationRoutePanel from './components/NavigationRoutePanel';
@@ -10,7 +10,16 @@ import BookingModal from './components/BookingModal';
 import BookingsListModal from './components/BookingsListModal';
 import RecyclingTipsModal from './components/RecyclingTipsModal';
 import EcoStatsBanner from './components/EcoStatsBanner';
+import RoleSwitcherBar from './components/RoleSwitcherBar';
+import AuthModal from './components/AuthModal';
+import DealerPortalModal from './components/DealerPortalModal';
+import FactoryPortalModal from './components/FactoryPortalModal';
+import AdminPortalModal from './components/AdminPortalModal';
+import DealerDashboardView from './components/DealerDashboardView';
+import FactoryDashboardView from './components/FactoryDashboardView';
+import AdminDashboardView from './components/AdminDashboardView';
 import { api } from './services/api';
+import { reverseGeocode } from './services/geocoding';
 import {
   Navigation,
   Compass,
@@ -18,21 +27,31 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Truck,
+  Factory,
+  User,
+  Building2,
+  ArrowRight
 } from 'lucide-react';
 import { Alert, Snackbar } from '@mui/material';
+import { useThemeMode } from './context/ThemeContext';
+import { useAuth } from './context/AuthContext';
 
-// Default Tamil Nadu geographical center
-const DEFAULT_TN_CENTER = {
-  lat: 11.1271,
-  lng: 78.6569,
-  zoom: 7.5,
-  name: 'Tamil Nadu Center'
+// Default Chennai geographical center (Ripon Building / Central)
+const DEFAULT_CHENNAI_CENTER = {
+  lat: 13.0827,
+  lng: 80.2707,
+  zoom: 12,
+  name: 'Chennai Central'
 };
 
 export default function App() {
+  const { isDark } = useThemeMode();
+  const { user, isCustomer, isDealer, isFactory, isAdmin } = useAuth();
+
   // Navigation & Location States
-  const [userLocation, setUserLocation] = useState(DEFAULT_TN_CENTER);
+  const [userLocation, setUserLocation] = useState(DEFAULT_CHENNAI_CENTER);
   const [isLocating, setIsLocating] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState('All');
   const [selectedWasteType, setSelectedWasteType] = useState('all');
@@ -40,6 +59,8 @@ export default function App() {
 
   // Data States
   const [collectors, setCollectors] = useState([]);
+  const [factories, setFactories] = useState([]);
+  const [selectedFactory, setSelectedFactory] = useState(null);
   const [districts, setDistricts] = useState([]);
   const [stats, setStats] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -52,12 +73,24 @@ export default function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isBookingsListOpen, setIsBookingsListOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authInitialRole, setAuthInitialRole] = useState('customer');
+  const [authRequiredMsg, setAuthRequiredMsg] = useState('');
+  const [isDealerOpen, setIsDealerOpen] = useState(false);
+  const [isFactoryOpen, setIsFactoryOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   // Notifications
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
   const showToast = (message, severity = 'info') => {
     setSnackbar({ open: true, message, severity });
+  };
+
+  const handleOpenRoleLogin = (role, message = '') => {
+    setAuthInitialRole(role);
+    setAuthRequiredMsg(message);
+    setIsAuthOpen(true);
   };
 
   // Fetch initial stats, districts, and bookings
@@ -85,6 +118,21 @@ export default function App() {
     }
     loadMeta();
   }, []);
+
+  // Fetch factories located in Chennai industrial corridors
+  const loadFactories = useCallback(async () => {
+    try {
+      const res = await api.getFactories({
+        lat: userLocation.lat,
+        lng: userLocation.lng
+      });
+      if (res && res.success) {
+        setFactories(res.factories || []);
+      }
+    } catch (err) {
+      console.warn('Could not load Chennai factories:', err);
+    }
+  }, [userLocation.lat, userLocation.lng]);
 
   // Fetch collectors whenever user location, waste type, district or search changes
   const loadCollectors = useCallback(async () => {
@@ -118,9 +166,10 @@ export default function App() {
 
   useEffect(() => {
     loadCollectors();
-  }, [loadCollectors]);
+    loadFactories();
+  }, [loadCollectors, loadFactories]);
 
-  // Handle GPS detection
+  // Handle GPS detection with high accuracy & reverse geocoding
   const handleLocateUser = () => {
     if (!navigator.geolocation) {
       showToast('Geolocation is not supported by your browser', 'error');
@@ -129,49 +178,91 @@ export default function App() {
 
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+        const accuracy = Math.round(pos.coords.accuracy || 0);
 
-        // Check if coordinate is approximately within or near Tamil Nadu
-        const isTN = lat >= 8.0 && lat <= 13.8 && lng >= 76.0 && lng <= 80.5;
+        // Check if coordinate is approximately within or near Chennai
+        const isChennai = lat >= 12.8 && lat <= 13.4 && lng >= 80.0 && lng <= 80.4;
+
+        let locationName = isChennai ? 'Your Chennai Ward GPS' : 'Detected GPS Location';
+        let fullAddress = '';
+        try {
+          const geo = await reverseGeocode(lat, lng);
+          if (geo && geo.shortName) {
+            locationName = geo.shortName;
+            fullAddress = geo.fullName;
+          }
+        } catch (e) {
+          console.warn('Reverse geocoding error:', e);
+        }
 
         setUserLocation({
           lat,
           lng,
-          zoom: 12,
-          name: isTN ? 'Your Detected GPS Location' : 'Your Location (Outside TN bounds)'
+          zoom: 14,
+          accuracy,
+          name: locationName,
+          address: fullAddress,
+          isManual: false
         });
         setIsLocating(false);
-        showToast(isTN ? 'GPS location detected in Tamil Nadu!' : 'Location detected. Calculating distances to Tamil Nadu hubs.', 'success');
+
+        if (accuracy > 1000) {
+          showToast(`Estimated location (±${(accuracy / 1000).toFixed(1)} km). Drag the green pin to refine your exact house or ward!`, 'warning');
+        } else if (accuracy > 80) {
+          showToast(`Location detected: ${locationName} (±${accuracy}m). Drag pin on map for doorstep precision.`, 'info');
+        } else {
+          showToast(`Accurate GPS location locked in Chennai: ${locationName}!`, 'success');
+        }
       },
       (err) => {
         setIsLocating(false);
-        showToast('Location permission denied or unavailable. You can click on the map to set your location.', 'warning');
+        showToast('Location permission denied or unavailable. Click any Chennai zone below to position map.', 'warning');
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
     );
   };
 
-  // Handle user manual click on map
-  const handleMapClickUpdate = (coords) => {
+  // Handle user manual click, search, or pin drag on map
+  const handleMapClickUpdate = async (coords) => {
+    let locationName = coords.name || `Pin (${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)})`;
+    let fullAddress = coords.address || '';
+
+    // If reverse-geocoded name is missing (clicked/dragged directly on map), fetch it
+    if (!coords.name || coords.name.startsWith('Pin (')) {
+      try {
+        const geo = await reverseGeocode(coords.lat, coords.lng);
+        if (geo && geo.shortName) {
+          locationName = geo.shortName;
+          fullAddress = geo.fullName;
+        }
+      } catch (e) {
+        console.warn('Reverse geocode error:', e);
+      }
+    }
+
     setUserLocation({
       lat: coords.lat,
       lng: coords.lng,
-      zoom: userLocation.zoom || 10,
-      name: `Custom Pin (${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)})`
+      zoom: coords.zoom || userLocation.zoom || 14,
+      accuracy: coords.accuracy || null,
+      name: locationName,
+      address: fullAddress,
+      isManual: true
     });
-    showToast('Origin set on map! Distances updated.', 'info');
+    showToast(`Origin set to ${locationName}! Distances updated.`, 'info');
   };
 
-  // Handle Quick District Click
-  const handleSelectDistrict = (districtKey, districtInfo) => {
-    setSelectedDistrict(districtKey);
+  // Handle Quick Zone Click
+  const handleSelectDistrict = (zoneKey, zoneInfo) => {
+    setSelectedDistrict(zoneKey);
     setUserLocation({
-      lat: districtInfo.lat,
-      lng: districtInfo.lng,
-      zoom: districtInfo.zoom,
-      name: districtInfo.label
+      lat: zoneInfo.lat,
+      lng: zoneInfo.lng,
+      zoom: zoneInfo.zoom || 13.5,
+      name: zoneInfo.label
     });
   };
 
@@ -182,7 +273,7 @@ export default function App() {
       ...prev,
       lat: prev.lat,
       lng: prev.lng,
-      zoom: 11
+      zoom: 13
     }));
     showToast(`Navigating to ${col.name} (${col.distanceKm} km)`, 'success');
   };
@@ -202,12 +293,43 @@ export default function App() {
   // On successful booking
   const handleBookingSuccess = (newBooking) => {
     setBookings((prev) => [newBooking, ...prev]);
-    showToast(`Booking ${newBooking.bookingId} confirmed!`, 'success');
+    showToast(`Pickup Request ${newBooking.bookingId} registered successfully!`, 'success');
+  };
+
+  const handleRoleSwitched = (roleKey) => {
+    showToast(`Switched to ${roleKey.toUpperCase()} service workspace!`, 'success');
+    loadCollectors();
+    loadFactories();
+    if (roleKey === 'dealer') setIsDealerOpen(true);
+    if (roleKey === 'factory') setIsFactoryOpen(true);
+    if (roleKey === 'admin') setIsAdminOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${
+      isDark
+        ? 'bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950'
+        : 'bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white'
+    }`}>
       
+      {/* Authenticated Persona Status Bar */}
+      <RoleSwitcherBar
+        onOpenDealerPortal={() => {
+          if (isDealer) setIsDealerOpen(true);
+          else handleOpenRoleLogin('dealer', 'Dealer authentication required to open Dealer Workspace.');
+        }}
+        onOpenFactoryPortal={() => {
+          if (isFactory) setIsFactoryOpen(true);
+          else handleOpenRoleLogin('factory', 'Industrial Factory authentication required to open Sourcing Marketplace.');
+        }}
+        onOpenAdminPortal={() => {
+          if (isAdmin) setIsAdminOpen(true);
+          else handleOpenRoleLogin('admin', 'GCC Ripon Municipal Administrative credentials required.');
+        }}
+        onOpenAuthForRole={(role) => handleOpenRoleLogin(role, '')}
+        onOpenBookings={() => setIsBookingsListOpen(true)}
+      />
+
       {/* Navbar */}
       <Navbar
         userLocation={userLocation}
@@ -217,129 +339,216 @@ export default function App() {
         bookingCount={bookings.length}
         onOpenBookings={() => setIsBookingsListOpen(true)}
         onOpenGuide={() => setIsGuideOpen(true)}
+        onOpenDealer={() => {
+          if (isDealer) setIsDealerOpen(true);
+          else handleOpenRoleLogin('dealer', 'Dealer authorization required to access collection operations & warehouse stock.');
+        }}
+        onOpenFactory={() => {
+          if (isFactory) setIsFactoryOpen(true);
+          else handleOpenRoleLogin('factory', 'Industrial Factory procurement credentials required to view marketplace.');
+        }}
+        onOpenAdmin={() => {
+          if (isAdmin) setIsAdminOpen(true);
+          else handleOpenRoleLogin('admin', 'GCC Ripon Municipal administrative credentials required for compliance audit.');
+        }}
+        onOpenAuth={() => handleOpenRoleLogin(user?.role || 'customer', '')}
+        onOpenRoleLogin={handleOpenRoleLogin}
       />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
-        {/* Top Hero Banner */}
-        <div className="relative rounded-3xl p-6 sm:p-8 overflow-hidden border border-emerald-500/20 bg-gradient-to-br from-emerald-950/60 via-slate-900 to-slate-950 shadow-2xl">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 max-w-3xl space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              <span>TNPCB Certified Eco-Network • Tamil Nadu Circular Economy</span>
-            </div>
+        {/* ============================================================== */}
+        {/* ROLE 1: CHENNAI RECOVERY DEALER DASHBOARD */}
+        {/* ============================================================== */}
+        {isDealer ? (
+          <>
+            <EcoStatsBanner stats={stats} />
+            <DealerDashboardView onBoundaryUpdated={loadCollectors} />
+          </>
+        ) : isFactory ? (
+        /* ============================================================== */
+        /* ROLE 2: CHENNAI INDUSTRIAL FACTORY DASHBOARD */
+        /* ============================================================== */
+          <>
+            <EcoStatsBanner stats={stats} />
+            <FactoryDashboardView />
+          </>
+        ) : isAdmin ? (
+        /* ============================================================== */
+        /* ROLE 3: GCC RIPON MUNICIPAL & TNPCB ADMIN DASHBOARD */
+        /* ============================================================== */
+          <>
+            <EcoStatsBanner stats={stats} />
+            <AdminDashboardView onDealerPointAdded={() => { loadCollectors(); loadFactories(); }} />
+          </>
+        ) : (
+        /* ============================================================== */
+        /* ROLE 4: CITIZEN CUSTOMER RECYCLING PORTAL (ONLY SEES DEALERS) */
+        /* ============================================================== */
+          <>
+            {/* Top Hero Banner - Chennai Citizen Edition */}
+            <div className={`relative rounded-3xl p-6 sm:p-8 overflow-hidden transition-all duration-300 ${
+              isDark
+                ? 'border border-emerald-500/20 bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-950 shadow-2xl'
+                : 'border border-emerald-500/25 bg-gradient-to-br from-emerald-50 via-white to-teal-50/70 shadow-lg'
+            }`}>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-400/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Locate & Navigate to the Nearest <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Waste Collector</span> in Tamil Nadu
-            </h1>
+              <div className="relative z-10 max-w-3xl space-y-3">
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${
+                  isDark
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                    : 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                }`}>
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                  <span>Citizen Recycling • Greater Chennai Corporation (GCC) & TNPCB Clean City</span>
+                </div>
 
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              Select your specific waste category below (Plastics, E-waste, Organic, Scrap Metal, Paper, Glass, Textiles) to map verified collection hubs across Chennai, Coimbatore, Madurai, Trichy, Salem, and beyond.
-            </p>
-          </div>
-        </div>
+                <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Give Household Waste to Verified <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
+                    isDark ? 'from-emerald-400 to-teal-300' : 'from-emerald-600 to-teal-500'
+                  }`}>Chennai Scrap Dealers</span>
+                </h1>
 
-        {/* Environmental Stats Metrics */}
-        <EcoStatsBanner stats={stats} />
+                <p className={`text-sm sm:text-base leading-relaxed max-w-2xl ${
+                  isDark ? 'text-slate-300' : 'text-slate-600'
+                }`}>
+                  Locate nearby certified recovery dealers across Anna Nagar, Adyar, Guindy, T. Nagar, Perungudi, and Ambattur. Book doorstep waste pickups, get paid live scrap rates, and accumulate eco-reward points.
+                </p>
 
-        {/* Section: Manual Waste Type Selector */}
-        <section className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
-          <WasteTypeFilter
-            selectedWasteType={selectedWasteType}
-            onSelectWasteType={(type) => {
-              setSelectedWasteType(type);
-              setSelectedCollector(null);
-            }}
-            matchingCollectorCount={collectors.length}
-          />
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    onClick={() => handleOpenBooking(collectors[0] || null)}
+                    className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Book Doorstep Scrap Pickup</span>
+                  </button>
 
-          {/* Quick Tamil Nadu District Filter */}
-          <div className="pt-2 border-t border-slate-800/80">
-            <QuickDistrictSelector
-              selectedDistrict={selectedDistrict}
-              onSelectDistrict={handleSelectDistrict}
-              districtStats={districts}
-            />
-          </div>
-        </section>
+                  <button
+                    onClick={handleLocateUser}
+                    className="px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 hover:bg-slate-100 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-800 transition-all flex items-center gap-1.5"
+                  >
+                    <Compass className="w-4 h-4 text-emerald-500" />
+                    <span>Find Nearest Dealer (GPS)</span>
+                  </button>
 
-        {/* Active Navigation Guidance Panel */}
-        {selectedCollector && (
-          <NavigationRoutePanel
-            collector={selectedCollector}
-            userLocation={userLocation}
-            onClose={() => setSelectedCollector(null)}
-            onOpenBooking={handleOpenBooking}
-          />
-        )}
-
-        {/* Map & Collector List Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Map Column (7 cols on Desktop) */}
-          <div className="lg:col-span-7 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-bold text-white text-base">
-                  Interactive Tamil Nadu Map
-                </h3>
+                  <button
+                    onClick={() => setIsBookingsListOpen(true)}
+                    className="px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 hover:bg-slate-100 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-800 transition-all flex items-center gap-1.5"
+                  >
+                    <span>My Pickup Bookings ({bookings.length})</span>
+                  </button>
+                </div>
               </div>
-              <span className="text-xs text-slate-400">
-                Pulsing green pin: Your Location • Dark pins: Recyclers
-              </span>
             </div>
 
-            <TamilNaduMap
-              collectors={collectors}
-              selectedCollector={selectedCollector}
-              onSelectCollector={(col) => setSelectedCollector(col)}
-              userLocation={userLocation}
-              onUpdateUserLocation={handleMapClickUpdate}
-              selectedWasteType={selectedWasteType}
-              mapCenter={[userLocation.lat, userLocation.lng]}
-              mapZoom={userLocation.zoom || 8}
-              onStartNavigation={handleStartNavigation}
-              onBookPickup={handleOpenBooking}
-            />
-          </div>
+            {/* Environmental Stats Metrics */}
+            <EcoStatsBanner stats={stats} />
 
-          {/* Collector Cards Column (5 cols on Desktop) */}
-          <div className="lg:col-span-5">
-            <CollectorList
-              collectors={collectors}
-              selectedCollector={selectedCollector}
-              onSelectCollector={(col) => setSelectedCollector(col)}
-              onStartNavigation={handleStartNavigation}
-              onOpenDetails={handleOpenDetails}
-              onOpenBooking={handleOpenBooking}
-              selectedWasteType={selectedWasteType}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              isLoading={isLoading}
-            />
-          </div>
+            {/* Section: Manual Waste Type Selector & Chennai Zone Filters */}
+            <section className="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+              <WasteTypeFilter
+                selectedWasteType={selectedWasteType}
+                onSelectWasteType={(type) => {
+                  setSelectedWasteType(type);
+                  setSelectedCollector(null);
+                }}
+                matchingCollectorCount={collectors.length}
+              />
 
-        </div>
+              {/* Quick Chennai Zone Filter */}
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80">
+                <QuickDistrictSelector
+                  selectedDistrict={selectedDistrict}
+                  onSelectDistrict={handleSelectDistrict}
+                  districtStats={districts}
+                />
+              </div>
+            </section>
+
+            {/* Active Navigation Guidance Panel */}
+            {selectedCollector && (
+              <NavigationRoutePanel
+                collector={selectedCollector}
+                userLocation={userLocation}
+                onClose={() => setSelectedCollector(null)}
+                onOpenBooking={handleOpenBooking}
+              />
+            )}
+
+            {/* Map & Collector Explorer Dual Panel: CUSTOMER ONLY SEES DEALERS */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              
+              {/* Map Column (7 cols on Desktop) - Customer Map ONLY displays Dealers */}
+              <div className="lg:col-span-7 h-[600px] lg:h-[720px]">
+                <TamilNaduMap
+                  collectors={collectors}
+                  factories={[]}
+                  allowFactories={false}
+                  selectedCollector={selectedCollector}
+                  onSelectCollector={(col) => setSelectedCollector(col)}
+                  userLocation={userLocation}
+                  onUpdateUserLocation={handleMapClickUpdate}
+                  selectedWasteType={selectedWasteType}
+                  mapCenter={[userLocation.lat, userLocation.lng]}
+                  mapZoom={userLocation.zoom || 12}
+                  onStartNavigation={handleStartNavigation}
+                  onBookPickup={handleOpenBooking}
+                  onLocateGPS={handleLocateUser}
+                  isLocating={isLocating}
+                />
+              </div>
+
+              {/* Collector Cards Column (5 cols on Desktop) - Certified Dealers to Give Waste To */}
+              <div className="lg:col-span-5 h-[600px] lg:h-[720px]">
+                <CollectorList
+                  collectors={collectors}
+                  selectedCollector={selectedCollector}
+                  onSelectCollector={(col) => setSelectedCollector(col)}
+                  onStartNavigation={handleStartNavigation}
+                  onOpenDetails={handleOpenDetails}
+                  onOpenBooking={handleOpenBooking}
+                  selectedWasteType={selectedWasteType}
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  isLoading={isLoading}
+                />
+              </div>
+
+            </div>
+          </>
+        )}
 
       </main>
 
       {/* Footer */}
-      <footer className="mt-12 border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500">
+      <footer className="mt-12 border-t border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-950 py-8 text-center text-xs text-slate-500 dark:text-slate-500 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
-          <p className="font-semibold text-slate-400">
-            EcoVision Tamil Nadu • Clean & Green Circular Resource Management
+          <p className="font-semibold text-slate-700 dark:text-slate-400">
+            EcoVision Chennai • Greater Chennai Corporation (GCC) & TNPCB Circular Resource Management
           </p>
           <p>
-            Fastify & Mongoose High-Performance API • React & Material-UI & Tailwind CSS • OpenStreetMap & Leaflet Integration
+            Role-Based Authentication (Customer, Dealer, Factory, Admin) • Fastify & Mongoose API • OpenStreetMap Chennai Grid
           </p>
         </div>
       </footer>
 
       {/* Modals & Dialogs */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => {
+          setIsAuthOpen(false);
+          setAuthRequiredMsg('');
+        }}
+        initialRole={authInitialRole}
+        requiredRoleMessage={authRequiredMsg}
+        onRoleSwitched={handleRoleSwitched}
+      />
+
       <CollectorDetailModal
         collector={modalCollector}
         open={isDetailOpen}
@@ -355,6 +564,8 @@ export default function App() {
         onClose={() => setIsBookingOpen(false)}
         defaultWasteType={selectedWasteType}
         onBookingSuccess={handleBookingSuccess}
+        userLocation={userLocation}
+        onLocateUser={handleLocateUser}
       />
 
       <BookingsListModal
@@ -368,6 +579,34 @@ export default function App() {
         onClose={() => setIsGuideOpen(false)}
       />
 
+      {/* Role-Specific Specialized Operation Portals */}
+      <DealerPortalModal
+        open={isDealerOpen}
+        onClose={() => setIsDealerOpen(false)}
+        onOpenRoleLogin={handleOpenRoleLogin}
+        onBoundaryUpdated={() => {
+          loadCollectors();
+          showToast('Dealer collection boundaries updated!', 'success');
+        }}
+      />
+
+      <FactoryPortalModal
+        open={isFactoryOpen}
+        onClose={() => setIsFactoryOpen(false)}
+        onOpenRoleLogin={handleOpenRoleLogin}
+      />
+
+      <AdminPortalModal
+        open={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        onOpenRoleLogin={handleOpenRoleLogin}
+        onDealerPointAdded={() => {
+          loadCollectors();
+          loadFactories();
+          showToast('Chennai dealer points updated on map!', 'success');
+        }}
+      />
+
       {/* Snackbar Alert */}
       <Snackbar
         open={snackbar.open}
@@ -378,7 +617,13 @@ export default function App() {
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
-          sx={{ width: '100%', bgcolor: '#0f172a', color: '#f8fafc', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+          sx={{
+            width: '100%',
+            bgcolor: isDark ? '#0f172a' : '#ffffff',
+            color: isDark ? '#f8fafc' : '#0f172a',
+            border: isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(16, 185, 129, 0.6)',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)'
+          }}
         >
           {snackbar.message}
         </Alert>

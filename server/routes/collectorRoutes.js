@@ -1,5 +1,5 @@
 import { Collector } from '../models/Collector.js';
-import { isDbLive, memoryStore } from '../config/db.js';
+import { isDbLive, memoryStore, logAudit } from '../config/db.js';
 
 export function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth's radius in km
@@ -30,8 +30,16 @@ export default async function collectorRoutes(fastify, options) {
     if (isDbLive()) {
       try {
         const query = {};
-        if (district && district !== 'All') {
-          query.district = new RegExp(`^${district}$`, 'i');
+        if (district && district !== 'All' && district.toLowerCase() !== 'all chennai') {
+          if (district.toLowerCase() === 'chennai') {
+            query.$or = [{ city: /^chennai$/i }, { district: /^chennai$/i }];
+          } else {
+            query.$or = [
+              { district: new RegExp(`^${district}$`, 'i') },
+              { zone: new RegExp(`^${district}$`, 'i') },
+              { address: new RegExp(district, 'i') }
+            ];
+          }
         }
         if (wasteType && wasteType !== 'all') {
           query['acceptedWasteTypes.category'] = wasteType;
@@ -40,7 +48,8 @@ export default async function collectorRoutes(fastify, options) {
           query.$or = [
             { name: { $regex: search, $options: 'i' } },
             { city: { $regex: search, $options: 'i' } },
-            { address: { $regex: search, $options: 'i' } }
+            { address: { $regex: search, $options: 'i' } },
+            { zone: { $regex: search, $options: 'i' } }
           ];
         }
 
@@ -52,8 +61,16 @@ export default async function collectorRoutes(fastify, options) {
     } else {
       items = [...memoryStore.collectors];
 
-      if (district && district !== 'All') {
-        items = items.filter(c => c.district.toLowerCase() === district.toLowerCase());
+      if (district && district !== 'All' && district.toLowerCase() !== 'all chennai') {
+        if (district.toLowerCase() === 'chennai') {
+          items = items.filter(c => (c.city && c.city.toLowerCase() === 'chennai') || (c.district && c.district.toLowerCase() === 'chennai'));
+        } else {
+          items = items.filter(c =>
+            (c.district && c.district.toLowerCase() === district.toLowerCase()) ||
+            (c.zone && c.zone.toLowerCase() === district.toLowerCase()) ||
+            (c.address && c.address.toLowerCase().includes(district.toLowerCase()))
+          );
+        }
       }
       if (wasteType && wasteType !== 'all') {
         items = items.filter(c => c.acceptedWasteTypes.some(w => w.category === wasteType));
@@ -63,6 +80,7 @@ export default async function collectorRoutes(fastify, options) {
         items = items.filter(c =>
           c.name.toLowerCase().includes(q) ||
           c.city.toLowerCase().includes(q) ||
+          (c.zone && c.zone.toLowerCase().includes(q)) ||
           c.address.toLowerCase().includes(q)
         );
       }
@@ -76,16 +94,20 @@ export default async function collectorRoutes(fastify, options) {
     items = items.map(collector => {
       let distanceKm = null;
       let durationMin = null;
+      let isWithinServiceBoundary = true;
 
       if (hasCoordinates) {
         distanceKm = calculateDistance(userLat, userLng, collector.lat, collector.lng);
         durationMin = estimateDriveDuration(distanceKm);
+        const radius = collector.serviceRadiusKm || 8;
+        isWithinServiceBoundary = distanceKm <= radius;
       }
 
       return {
         ...collector,
         distanceKm,
-        durationMin
+        durationMin,
+        isWithinServiceBoundary
       };
     });
 
@@ -108,6 +130,158 @@ export default async function collectorRoutes(fastify, options) {
     };
   });
 
+  // GET all Chennai industrial factories
+  fastify.get('/factories', async (request) => {
+    const { search, district, lat, lng } = request.query || {};
+    let items = [...(memoryStore.factories || [])];
+
+    if (search) {
+      const q = search.toLowerCase();
+      items = items.filter(f =>
+        f.name.toLowerCase().includes(q) ||
+        (f.zone && f.zone.toLowerCase().includes(q)) ||
+        (f.primaryCategory && f.primaryCategory.toLowerCase().includes(q)) ||
+        f.address.toLowerCase().includes(q)
+      );
+    }
+
+    if (district && district !== 'All' && district.toLowerCase() !== 'all chennai' && district.toLowerCase() !== 'chennai') {
+      items = items.filter(f =>
+        f.district.toLowerCase() === district.toLowerCase() ||
+        (f.zone && f.zone.toLowerCase() === district.toLowerCase())
+      );
+    }
+
+    const userLat = parseFloat(lat);
+    const userLng = parseFloat(lng);
+    const hasCoordinates = !isNaN(userLat) && !isNaN(userLng);
+
+    if (hasCoordinates) {
+      items = items.map(f => {
+        const distanceKm = calculateDistance(userLat, userLng, f.lat, f.lng);
+        return {
+          ...f,
+          distanceKm,
+          durationMin: estimateDriveDuration(distanceKm)
+        };
+      }).sort((a, b) => (a.distanceKm || 99999) - (b.distanceKm || 99999));
+    }
+
+    return {
+      success: true,
+      count: items.length,
+      factories: items
+    };
+  });
+
+  // POST create a new dealer collection point (Admin or Dealer)
+  fastify.post('/collectors', async (request, reply) => {
+    const {
+      name,
+      district = 'Guindy',
+      zone,
+      city = 'Chennai',
+      address,
+      lat = 13.0067,
+      lng = 80.2012,
+      phone,
+      email = '',
+      tnpcbRegNo,
+      operatingHours = '08:00 AM - 07:00 PM',
+      serviceRadiusKm = 8,
+      serviceWards = [],
+      dealerUserId = '',
+      acceptedWasteTypes = [],
+      description = '',
+      pointType = 'dealer'
+    } = request.body || {};
+
+    if (!name || !address) {
+      return reply.code(400).send({
+        success: false,
+        message: 'Name and address are required to create a collection point.'
+      });
+    }
+
+    const newPoint = {
+      _id: `col_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      name,
+      district,
+      zone: zone || district,
+      city,
+      address,
+      lat: parseFloat(lat) || 13.0827,
+      lng: parseFloat(lng) || 80.2707,
+      phone: phone || '+91 94440 00000',
+      email,
+      tnpcbRegNo: tnpcbRegNo || `TNPCB/CHN/REG/${Date.now().toString().slice(-4)}`,
+      rating: 4.8,
+      totalReviews: 8,
+      operatingHours,
+      serviceRadiusKm: parseFloat(serviceRadiusKm) || 8,
+      serviceWards: Array.isArray(serviceWards) && serviceWards.length > 0 ? serviceWards : [district],
+      dealerUserId,
+      pointType,
+      capacityLoad: 30,
+      isVerified: true,
+      description: description || `Authorized Chennai circular recovery facility in ${district}.`,
+      acceptedWasteTypes: Array.isArray(acceptedWasteTypes) && acceptedWasteTypes.length > 0 ? acceptedWasteTypes : [
+        { category: 'plastic', ratePerKg: 19, acceptsDropoff: true, acceptsPickup: true },
+        { category: 'metal', ratePerKg: 38, acceptsDropoff: true, acceptsPickup: true },
+        { category: 'paper', ratePerKg: 15, acceptsDropoff: true, acceptsPickup: true }
+      ],
+      createdAt: new Date()
+    };
+
+    if (isDbLive()) {
+      try {
+        await Collector.create(newPoint);
+      } catch (e) {
+        console.warn('DB write note for new collector point:', e.message);
+      }
+    }
+    memoryStore.collectors.unshift(newPoint);
+
+    await logAudit({
+      action: 'DEALER_POINT_CREATED',
+      category: 'ADMIN',
+      actor: { id: dealerUserId || 'admin', name: name, role: 'admin' },
+      targetResource: 'Collector',
+      targetId: newPoint._id,
+      details: `Created new dealer collection point: ${name} (${district}) with ${newPoint.serviceRadiusKm} km waste collection boundary.`
+    });
+
+    return {
+      success: true,
+      message: `Dealer collection point '${name}' added successfully with ${newPoint.serviceRadiusKm} km coverage boundary!`,
+      collector: newPoint
+    };
+  });
+
+  // DELETE a dealer collection point
+  fastify.delete('/collectors/:id', async (request, reply) => {
+    const { id } = request.params;
+    const index = memoryStore.collectors.findIndex(c => c._id === id || c.name === id);
+    if (index !== -1) {
+      const deleted = memoryStore.collectors.splice(index, 1)[0];
+      if (isDbLive()) {
+        try {
+          await Collector.findByIdAndDelete(id);
+        } catch (e) {}
+      }
+      await logAudit({
+        action: 'DEALER_POINT_DELETED',
+        category: 'ADMIN',
+        actor: { id: 'admin', name: 'Admin', role: 'admin' },
+        targetResource: 'Collector',
+        targetId: id,
+        details: `Deleted dealer collection point: ${deleted.name}`
+      });
+      return { success: true, message: `Dealer collection point '${deleted.name}' deleted successfully.` };
+    }
+    return reply.code(404).send({ success: false, message: 'Collector point not found' });
+  });
+
   // GET single collector
   fastify.get('/collectors/:id', async (request, reply) => {
     const { id } = request.params;
@@ -116,9 +290,7 @@ export default async function collectorRoutes(fastify, options) {
     if (isDbLive()) {
       try {
         collector = await Collector.findById(id).lean();
-      } catch (e) {
-        // ID might be non-ObjectId format if fallback ID
-      }
+      } catch (e) {}
     }
 
     if (!collector) {
@@ -143,32 +315,32 @@ export default async function collectorRoutes(fastify, options) {
       return reply.code(400).send({ success: false, message: 'Valid lat and lng are required' });
     }
 
-    let allCollectors = [];
-    if (isDbLive()) {
-      try {
-        allCollectors = await Collector.find().lean();
-      } catch (err) {
-        allCollectors = [...memoryStore.collectors];
-      }
-    } else {
-      allCollectors = [...memoryStore.collectors];
-    }
+    let allCollectors = memoryStore.collectors;
 
     let filtered = allCollectors;
     if (wasteType && wasteType !== 'all') {
       filtered = filtered.filter(c => c.acceptedWasteTypes.some(w => w.category === wasteType));
     }
-    if (district && district !== 'All') {
-      filtered = filtered.filter(c => c.district.toLowerCase() === district.toLowerCase());
+    if (district && district !== 'All' && district.toLowerCase() !== 'all chennai') {
+      if (district.toLowerCase() === 'chennai') {
+        filtered = filtered.filter(c => (c.city && c.city.toLowerCase() === 'chennai') || (c.district && c.district.toLowerCase() === 'chennai'));
+      } else {
+        filtered = filtered.filter(c =>
+          (c.district && c.district.toLowerCase() === district.toLowerCase()) ||
+          (c.zone && c.zone.toLowerCase() === district.toLowerCase())
+        );
+      }
     }
 
     const calculated = filtered.map(c => {
       const distanceKm = calculateDistance(userLat, userLng, c.lat, c.lng);
+      const radius = c.serviceRadiusKm || 8;
       return {
         ...c,
         _id: c._id ? c._id.toString() : undefined,
         distanceKm,
-        durationMin: estimateDriveDuration(distanceKm)
+        durationMin: estimateDriveDuration(distanceKm),
+        isWithinServiceBoundary: distanceKm <= radius
       };
     });
 
@@ -185,13 +357,14 @@ export default async function collectorRoutes(fastify, options) {
     };
   });
 
-  // GET unique districts list
+  // GET unique districts/zones list
   fastify.get('/districts', async () => {
-    let collectors = isDbLive() ? await Collector.find().lean() : memoryStore.collectors;
+    let collectors = memoryStore.collectors;
     const districtCounts = {};
 
     collectors.forEach(c => {
-      districtCounts[c.district] = (districtCounts[c.district] || 0) + 1;
+      const name = c.zone || c.district || 'Chennai';
+      districtCounts[name] = (districtCounts[name] || 0) + 1;
     });
 
     const list = Object.keys(districtCounts).sort().map(d => ({
