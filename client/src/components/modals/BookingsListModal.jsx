@@ -14,7 +14,7 @@ import {
   Leaf,
   MapPin
 } from 'lucide-react';
-import { useThemeMode } from '../context/ThemeContext';
+import { useThemeMode } from '../../context/ThemeContext';
 
 export default function BookingsListModal({ open, onClose, bookings = [] }) {
   const { isDark } = useThemeMode();
@@ -117,7 +117,7 @@ export default function BookingsListModal({ open, onClose, bookings = [] }) {
 
                   <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>{b.status.toUpperCase()}</span>
+                    <span>{(b.status || 'pending').toUpperCase()}</span>
                   </span>
                 </div>
 

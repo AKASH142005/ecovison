@@ -12,8 +12,8 @@ import {
   Lock,
   Layers
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useThemeMode } from '../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const ROLE_ENTRIES = [
   {
@@ -55,9 +55,6 @@ const ROLE_ENTRIES = [
 ];
 
 export default function RoleSwitcherBar({
-  onOpenDealerPortal,
-  onOpenFactoryPortal,
-  onOpenAdminPortal,
   onOpenAuthForRole,
   onOpenBookings
 }) {
@@ -102,7 +99,7 @@ export default function RoleSwitcherBar({
         <div className="flex items-center gap-2 shrink-0">
           {isCustomer && (
             <div className="flex items-center gap-1.5 text-xs text-slate-300">
-              <span className="text-[11px] text-slate-400 hidden sm:inline">Are you a Dealer or Industrial Buyer?</span>
+              <span className="text-[11px] text-slate-400 hidden sm:inline">Role Portals:</span>
               <button
                 onClick={() => onOpenAuthForRole('dealer')}
                 className="px-2.5 py-1 rounded-xl text-xs font-bold bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 border border-blue-500/40 transition-all flex items-center gap-1"
@@ -119,6 +116,14 @@ export default function RoleSwitcherBar({
                 <Factory className="w-3 h-3 text-amber-400" />
                 <span>Factory Login</span>
               </button>
+              <button
+                onClick={() => onOpenAuthForRole('admin')}
+                className="px-2.5 py-1 rounded-xl text-xs font-bold bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 transition-all flex items-center gap-1"
+                title="Log In as GCC Ripon Admin"
+              >
+                <ShieldCheck className="w-3 h-3 text-purple-400" />
+                <span>Admin Login</span>
+              </button>
             </div>
           )}
 
@@ -127,6 +132,14 @@ export default function RoleSwitcherBar({
               <span className="text-xs text-slate-400 hidden sm:inline">
                 Switched to isolated {user?.role?.toUpperCase()} workspace
               </span>
+              <button
+                onClick={() => onOpenAuthForRole('customer')}
+                className="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 transition-all flex items-center gap-1"
+                title="Switch back to Citizen map"
+              >
+                <User className="w-3 h-3 text-emerald-400" />
+                <span>Citizen View</span>
+              </button>
             </div>
           )}
 

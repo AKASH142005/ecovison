@@ -11,7 +11,7 @@ import {
   Trash2,
   ShieldCheck
 } from 'lucide-react';
-import { useThemeMode } from '../context/ThemeContext';
+import { useThemeMode } from '../../context/ThemeContext';
 
 export default function RecyclingTipsModal({ open, onClose }) {
   const { isDark } = useThemeMode();

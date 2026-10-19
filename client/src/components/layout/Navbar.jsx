@@ -15,8 +15,8 @@ import {
   Lock
 } from 'lucide-react';
 import { Button, Tooltip } from '@mui/material';
-import { useThemeMode } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+import { useThemeMode } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar({
   userLocation,
@@ -26,9 +26,6 @@ export default function Navbar({
   bookingCount,
   onOpenBookings,
   onOpenGuide,
-  onOpenDealer,
-  onOpenFactory,
-  onOpenAdmin,
   onOpenAuth,
   onOpenRoleLogin
 }) {
@@ -67,7 +64,7 @@ export default function Navbar({
             <MapPin className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
             <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">Chennai:</span>
             <span className="font-semibold text-emerald-600 dark:text-emerald-300 max-w-[140px] sm:max-w-[200px] truncate" title={locationName || userLocation?.address || ''}>
-              {locationName || (userLocation ? `${userLocation.lat.toFixed(3)}, ${userLocation.lng.toFixed(3)}` : 'Chennai Central')}
+              {locationName || (userLocation && typeof userLocation.lat === 'number' && !isNaN(userLocation.lat) ? `${userLocation.lat.toFixed(3)}, ${userLocation.lng.toFixed(3)}` : 'Chennai Central')}
             </span>
             {userLocation?.accuracy ? (
               <span className="hidden md:inline-block px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900" title={`GPS Accuracy: ±${userLocation.accuracy}m`}>
@@ -124,38 +121,26 @@ export default function Navbar({
             </div>
           </button>
 
-          {/* Role-Specific Active Navigation Actions */}
+          {/* Role-Specific Active Workspace Badges */}
           {isDealer && (
-            <button
-              onClick={onOpenDealer}
-              className="px-3 py-1.5 rounded-xl text-xs font-black bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/25 flex items-center gap-1.5 transition-all"
-              title="Open Dealer Hub Workspace"
-            >
+            <div className="px-3 py-1.5 rounded-xl text-xs font-black bg-blue-600/15 text-blue-500 border border-blue-500/30 flex items-center gap-1.5">
               <Truck className="w-3.5 h-3.5" />
               <span>Dealer Workspace</span>
-            </button>
+            </div>
           )}
 
           {isFactory && (
-            <button
-              onClick={onOpenFactory}
-              className="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/25 flex items-center gap-1.5 transition-all"
-              title="Open Factory Sourcing Portal"
-            >
+            <div className="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-500/15 text-amber-500 border border-amber-500/30 flex items-center gap-1.5">
               <Factory className="w-3.5 h-3.5" />
               <span>Factory Procurement</span>
-            </button>
+            </div>
           )}
 
           {isAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              className="px-3 py-1.5 rounded-xl text-xs font-black bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-500/25 flex items-center gap-1.5 transition-all"
-              title="Open GCC Ripon Governance Core"
-            >
+            <div className="px-3 py-1.5 rounded-xl text-xs font-black bg-purple-600/15 text-purple-400 border border-purple-500/30 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>GCC Ripon Core</span>
-            </button>
+            </div>
           )}
 
           <Button
