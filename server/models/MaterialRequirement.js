@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const materialRequirementSchema = new mongoose.Schema({
+  _id: { type: String },
   requirementId: { type: String, required: true, unique: true },
   factoryId: { type: String, required: true },
   factoryName: { type: String, required: true },

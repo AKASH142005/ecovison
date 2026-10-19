@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const dealerInventorySchema = new mongoose.Schema({
+  _id: { type: String },
   dealerId: { type: String, required: true },
   dealerName: { type: String, required: true },
   category: { type: String, required: true },

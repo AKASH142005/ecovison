@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const purchaseOrderSchema = new mongoose.Schema({
+  _id: { type: String },
   poNumber: { type: String, required: true, unique: true },
   requirementId: { type: String, required: true },
   factoryId: { type: String, required: true },
