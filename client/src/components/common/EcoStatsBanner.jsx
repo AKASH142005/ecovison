@@ -17,7 +17,7 @@ import {
   Calendar,
   Layers
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function EcoStatsBanner({ stats }) {
   const { user, isCustomer, isDealer, isFactory, isAdmin, aggregations } = useAuth();

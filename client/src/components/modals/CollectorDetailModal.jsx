@@ -16,7 +16,7 @@ import {
   Calendar,
   Award
 } from 'lucide-react';
-import { useThemeMode } from '../context/ThemeContext';
+import { useThemeMode } from '../../context/ThemeContext';
 
 export default function CollectorDetailModal({
   collector,
@@ -158,7 +158,7 @@ export default function CollectorDetailModal({
               <div>
                 <p className="font-semibold text-slate-900 dark:text-white">{collector.address}</p>
                 <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                  District: {collector.district} | GPS: {collector.lat.toFixed(5)}, {collector.lng.toFixed(5)}
+                  District: {collector.district} | GPS: {typeof collector.lat === 'number' ? collector.lat.toFixed(5) : (collector.lat || 'N/A')}, {typeof collector.lng === 'number' ? collector.lng.toFixed(5) : (collector.lng || 'N/A')}
                 </p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function CollectorDetailModal({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {collector.acceptedWasteTypes.map((item, idx) => (
+              {(collector.acceptedWasteTypes || []).map((item, idx) => (
                 <div
                   key={idx}
                   className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/80 hover:border-emerald-500/40 transition-all flex items-center justify-between"

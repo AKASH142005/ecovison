@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,8 +32,8 @@ import {
   BookOpen
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { api } from '../services/api';
-import { useThemeMode } from '../context/ThemeContext';
+import { api } from '../../services/api';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const DEFAULT_CATEGORIES = [
   { id: 'plastic', name: 'Plastics & Polymers', rate: 20, co2: 1.8, icon: Package, color: 'from-cyan-500 to-blue-600', badge: 'Recyclable' },
@@ -82,6 +82,16 @@ export default function BookingModal({
   const [errorMsg, setErrorMsg] = useState('');
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [copiedId, setCopiedId] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      if (defaultWasteType && defaultWasteType !== 'all') {
+        setWasteCategory(defaultWasteType);
+      }
+      setConfirmedBooking(null);
+      setErrorMsg('');
+    }
+  }, [open, defaultWasteType]);
 
   // Compute live estimated earnings and CO2
   const currentCat = DEFAULT_CATEGORIES.find(c => c.id === wasteCategory) || DEFAULT_CATEGORIES[0];
