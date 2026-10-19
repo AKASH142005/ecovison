@@ -221,36 +221,80 @@ export const api = {
   },
 
   async shipOrder(id, vehicleNumber, dispatchDate) {
+    let payload = {};
+    if (typeof vehicleNumber === 'object' && vehicleNumber !== null) {
+      payload = vehicleNumber;
+    } else {
+      payload = { vehicleNumber, dispatchDate };
+    }
     const res = await fetch(`${API_BASE}/marketplace/orders/${id}/ship`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ vehicleNumber, dispatchDate })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to mark shipment');
+    if (data.purchaseOrder && !data.order) data.order = data.purchaseOrder;
+    if (data.order && !data.purchaseOrder) data.purchaseOrder = data.order;
     return data;
+  },
+
+  async shipPurchaseOrder(id, vehicleNumber, dispatchDate) {
+    return this.shipOrder(id, vehicleNumber, dispatchDate);
   },
 
   async verifyShipment(id, verifiedWeightKg, qualityGrade, notes) {
+    let payload = {};
+    if (typeof verifiedWeightKg === 'object' && verifiedWeightKg !== null) {
+      payload = verifiedWeightKg;
+    } else {
+      payload = { verifiedWeightKg, qualityGrade, notes };
+    }
     const res = await fetch(`${API_BASE}/marketplace/orders/${id}/verify`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ verifiedWeightKg, qualityGrade, notes })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to verify shipment');
+    if (data.purchaseOrder && !data.order) data.order = data.purchaseOrder;
+    if (data.order && !data.purchaseOrder) data.purchaseOrder = data.order;
     return data;
   },
 
+  async verifyPurchaseOrder(id, verifiedWeightKg, qualityGrade, notes) {
+    return this.verifyShipment(id, verifiedWeightKg, qualityGrade, notes);
+  },
+
+  async verifyOrder(id, verifiedWeightKg, qualityGrade, notes) {
+    return this.verifyShipment(id, verifiedWeightKg, qualityGrade, notes);
+  },
+
   async releasePayment(id, paymentStatus, paymentRef) {
+    let payload = {};
+    if (typeof paymentStatus === 'object' && paymentStatus !== null) {
+      payload = paymentStatus;
+    } else {
+      payload = { paymentStatus, paymentRef };
+    }
     const res = await fetch(`${API_BASE}/marketplace/orders/${id}/payment`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ paymentStatus, paymentRef })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to release payment');
+    if (data.purchaseOrder && !data.order) data.order = data.purchaseOrder;
+    if (data.order && !data.purchaseOrder) data.purchaseOrder = data.order;
     return data;
+  },
+
+  async payPurchaseOrder(id, paymentStatus, paymentRef) {
+    return this.releasePayment(id, paymentStatus, paymentRef);
+  },
+
+  async payOrder(id, paymentStatus, paymentRef) {
+    return this.releasePayment(id, paymentStatus, paymentRef);
   },
 
   // --- ADMIN PLATFORM & AUDIT LOGS ---

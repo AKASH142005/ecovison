@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const [aggregations, setAggregations] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshAggregations = async () => {
+  const refreshAggregations = useCallback(async () => {
     try {
       const res = await api.getProfileAggregations();
       if (res && res.success) {
@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.warn('Could not load profile aggregations:', e.message);
     }
-  };
+  }, []);
 
   // Initialize session and fetch demo users
   useEffect(() => {
@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const switchRole = async (targetRole) => {
+  const switchRole = useCallback(async (targetRole) => {
     try {
       const res = await api.switchDemoRole(targetRole);
       if (res.success) {
@@ -91,9 +91,9 @@ export function AuthProvider({ children }) {
       console.error('Failed to switch role:', err);
       throw err;
     }
-  };
+  }, [refreshAggregations]);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     const res = await api.login(email, password);
     if (res.success) {
       localStorage.setItem('ecovision_token', res.token);
@@ -102,9 +102,9 @@ export function AuthProvider({ children }) {
       refreshAggregations();
       return res.user;
     }
-  };
+  }, [refreshAggregations]);
 
-  const register = async (userData) => {
+  const register = useCallback(async (userData) => {
     const res = await api.register(userData);
     if (res.success) {
       localStorage.setItem('ecovision_token', res.token);
@@ -113,35 +113,35 @@ export function AuthProvider({ children }) {
       refreshAggregations();
       return res.user;
     }
-  };
+  }, [refreshAggregations]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('ecovision_token');
     setToken(null);
     setAggregations(null);
     // Reset to Customer Citizen
     switchRole('customer');
-  };
+  }, [switchRole]);
+
+  const contextValue = useMemo(() => ({
+    user,
+    token,
+    demoUsers,
+    aggregations,
+    refreshAggregations,
+    loading,
+    switchRole,
+    login,
+    register,
+    logout,
+    isCustomer: user?.role === 'customer',
+    isDealer: user?.role === 'dealer',
+    isFactory: user?.role === 'factory',
+    isAdmin: user?.role === 'admin'
+  }), [user, token, demoUsers, aggregations, refreshAggregations, loading, switchRole, login, register, logout]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        demoUsers,
-        aggregations,
-        refreshAggregations,
-        loading,
-        switchRole,
-        login,
-        register,
-        logout,
-        isCustomer: user?.role === 'customer',
-        isDealer: user?.role === 'dealer',
-        isFactory: user?.role === 'factory',
-        isAdmin: user?.role === 'admin'
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

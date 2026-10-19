@@ -102,6 +102,7 @@ export async function searchLocations(query) {
 
     const results = items.map((item) => ({
       name: formatAddress(item) || item.display_name.split(',').slice(0, 2).join(','),
+      shortName: formatAddress(item) || item.display_name.split(',').slice(0, 2).join(','),
       fullName: item.display_name,
       lat: parseFloat(item.lat),
       lng: parseFloat(item.lon)
