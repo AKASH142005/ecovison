@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'https://ecovison.onrender.com';
 
 function getAuthHeaders() {
   const token = localStorage.getItem('ecovision_token');
