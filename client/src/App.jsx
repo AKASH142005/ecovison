@@ -5,7 +5,6 @@ import { useLocationManager } from './hooks/useLocationManager';
 import { useEcoData } from './hooks/useEcoData';
 import {
   Navbar,
-  RoleSwitcherBar,
   Footer,
   CustomerHomeView,
   EcoStatsBanner,
@@ -109,11 +108,6 @@ export default function App() {
         ? 'bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950'
         : 'bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white'
     }`}>
-      {/* Role Navigation Bar */}
-      <RoleSwitcherBar
-        onOpenAuthForRole={(role) => handleOpenRoleLogin(role, '')}
-        onOpenBookings={() => setIsBookingsListOpen(true)}
-      />
 
       {/* Main Navbar */}
       <Navbar
